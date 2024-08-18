@@ -1,12 +1,9 @@
 <script>
 	import { CircleChevronDown, Pause, Play, X } from 'lucide-svelte';
-	import { onMount } from 'svelte';
 	import { fly } from 'svelte/transition';
 
-	const rainSrc = ['/rain1.mp3', '/rain2.mp3', '/rain3.mp3'];
-	const backgroundSrc = ['/rain1.webm', '/rain2.webm', '/rain3.webm'];
-
-	
+	const rainSrc = ['/audio/rain1.mp3', '/audio/rain2.mp3', '/audio/rain3.mp3'];
+	const backgroundSrc = ['/video/rain1.webm', '/video/rain2.webm', '/video/rain3.webm'];
 
 	let pause = $state(false);
 	let volume = $state(80);
