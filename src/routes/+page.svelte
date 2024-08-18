@@ -5,13 +5,14 @@
 	const rainSrc = ['/audio/rain1.mp3', '/audio/rain2.mp3', '/audio/rain3.mp3'];
 	const backgroundSrc = ['/video/rain1.webm', '/video/rain2.webm', '/video/rain3.webm'];
 
-	let pause = $state(false);
+	let player;
+
+	let pause = $state(player?.paused);
 	let volume = $state(80);
 	let currentAudioSrcIndx = $state(0);
 	let currentBgSrcIndx = $state(1);
 	let menuHidden = $state(false);
 
-	let player;
 
 	function setPause() {
 		pause = !pause;
@@ -43,10 +44,10 @@
 	<audio bind:this={player} loop autoplay src={rainSrc[currentAudioSrcIndx]} />
 </section>
 
-<div class="min-w-fit  min-h-screen flex flex-col">
-	<main class="h-full flex-1">
-		{#if !menuHidden}
-			<div class="hero h-full">
+<div class="min-w-fit min-h-screen flex flex-col">
+	{#if !menuHidden}
+		<main class="h-full">
+			<div class="hero min-h-screen">
 				<div class="hero-content flex-col w-full min-h-full">
 					<div
 						class="card bg-base-100 w-full max-w-sm shrink-0 shadow-2xl"
@@ -125,20 +126,24 @@
 					</div>
 				</div>
 			</div>
-		{:else}
+		</main>
+	{:else}
+		<main class="flex-1">
 			<div class="flex justify-center pt-3">
 				<button
 					class="btn btn-circle btn-ghost"
 					onclick={() => showMenu()}
 					in:fly={{ y: 20, delay: 500 }}
-					out:fly={{ y: 20 }}
 				>
 					<CircleChevronDown />
 				</button>
 			</div>
-		{/if}
-	</main>
-	<footer class="text-center text-xs text-gray-500 p-3">
-		<span>Dev by ✨ <a href="mailto:meshchaninov.n@gmail.com" class="link">Nikita Meshchaninov</a></span>
-	</footer>
+		</main>
+		<footer class="text-center text-xs text-gray-500 p-3">
+			<span
+				>Dev by ✨ <a href="mailto:meshchaninov.n@gmail.com" class="link">Nikita Meshchaninov</a
+				></span
+			>
+		</footer>
+	{/if}
 </div>
