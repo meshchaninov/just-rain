@@ -1,10 +1,12 @@
 <script>
 	import { CircleChevronDown, Pause, Play, X } from 'lucide-svelte';
-	import { fade, fly } from 'svelte/transition';
 	import { onMount } from 'svelte';
+	import { fly } from 'svelte/transition';
 
 	const rainSrc = ['/rain1.mp3', '/rain2.mp3', '/rain3.mp3'];
 	const backgroundSrc = ['/rain1.webm', '/rain2.webm', '/rain3.webm'];
+
+	
 
 	let pause = $state(false);
 	let volume = $state(80);
@@ -13,6 +15,7 @@
 	let menuHidden = $state(false);
 
 	let player;
+
 
 	function setPause() {
 		pause = !pause;
