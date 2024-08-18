@@ -63,10 +63,10 @@
 			<div class="hero min-h-screen">
 				<div class="hero-content flex-col w-full min-h-full">
 					<div
-						class="card bg-base-100 w-full max-w-sm shrink-0 shadow-2xl"
+						class="card bg-base-100 max-w-sm shrink-0 shadow-2xl"
 						transition:fly={{ y: -400 }}
 					>
-						<div class="card-body w-96">
+						<div class="card-body w-80 lg:w-96">
 							<div class="flex justify-end">
 								<button class="btn btn-sm btn-ghost btn-circle" onclick={() => showMenu()}>
 									<X class="w-6 h-6" />
