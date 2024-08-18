@@ -1,5 +1,6 @@
 <script>
 	import { CircleChevronDown, Pause, Play, X, Star } from 'lucide-svelte';
+	import { onMount } from 'svelte';
 	import { fly } from 'svelte/transition';
 
 	const rainSrc = ['/audio/rain1.mp3', '/audio/rain2.mp3', '/audio/rain3.mp3'];
@@ -7,11 +8,15 @@
 
 	let player;
 
-	let pause = $state(player?.paused);
+	let pause = $state(true);
 	let volume = $state(80);
 	let currentAudioSrcIndx = $state(0);
 	let currentBgSrcIndx = $state(1);
 	let menuHidden = $state(false);
+
+	onMount(() => {
+		player.pause();
+	});
 
 
 	function setPause() {
@@ -30,6 +35,14 @@
 		menuHidden = !menuHidden;
 	}
 </script>
+
+<svelte:head>
+	<title>Just Rain</title>
+	<meta property="og:title" content="Just Rain" />
+	<meta property="og:description"
+		content="Welcome to Rain Sound Oasis, your ultimate destination for relaxation and tranquility. Immerse yourself in the soothing symphony of rain, designed to help you unwind, focus, or drift into a peaceful sleep." />
+	<meta property="og:image" content="/previewImage.webp" />
+</svelte:head>
 
 <section>
 	<video
