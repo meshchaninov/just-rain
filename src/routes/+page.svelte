@@ -18,6 +18,10 @@
 		player.pause();
 	});
 
+	$effect(() => {
+		player.volume = volume / 100;
+	});
+
 
 	function setPause() {
 		pause = !pause;
@@ -26,9 +30,6 @@
 		} else {
 			player.play();
 		}
-	}
-	function setVolume() {
-		player.volume = volume / 100;
 	}
 
 	function showMenu() {
@@ -57,7 +58,7 @@
 	<audio bind:this={player} loop autoplay src={rainSrc[currentAudioSrcIndx]} />
 </section>
 
-<div class="min-w-fit min-h-screen flex flex-col">
+<div class="min-w-fit h-svh flex flex-col">
 	{#if !menuHidden}
 		<main class="h-full">
 			<div class="hero min-h-screen">
@@ -85,7 +86,6 @@
 											max="100"
 											class="range"
 											bind:value={volume}
-											onchange={setVolume}
 										/>
 									</div>
 
