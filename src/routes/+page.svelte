@@ -4,12 +4,12 @@
 	import { onMount } from 'svelte';
 
 	const rainSrc = ['/rain1.mp3', '/rain2.mp3', '/rain3.mp3'];
-	const backgroundSrc = ['/rain1.mp4', '/rain2.mp4', '/rain3.mp4'];
+	const backgroundSrc = ['/rain1.webm', '/rain2.webm', '/rain3.webm'];
 
 	let pause = $state(false);
 	let volume = $state(80);
 	let currentAudioSrcIndx = $state(0);
-	let currentBgSrcIndx = $state(2);
+	let currentBgSrcIndx = $state(1);
 	let menuHidden = $state(false);
 
 	let player;
