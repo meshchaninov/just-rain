@@ -1,6 +1,7 @@
 <script>
 	import { CircleChevronDown, Pause, Play, X } from 'lucide-svelte';
-	import { fly } from 'svelte/transition';
+	import { onMount } from 'svelte';
+	import { fly, fade, blur } from 'svelte/transition';
 
 	const rainSrc = ['/audio/rain1.mp3', '/audio/rain2.mp3', '/audio/rain3.mp3'];
 	const backgroundSrc = ['/video/rain1.webm', '/video/rain2.webm', '/video/rain3.webm'];
@@ -11,11 +12,27 @@
 	let volume = $state(0.8);
 	let currentAudioSrc = $state(rainSrc[0]);
 	let currentBgSrc = $state(backgroundSrc[1]);
-	let menuHidden = $state(false);
+	let menuHidden = $state(true);
+	let time = $state(new Date());
+	let currentTime = $derived(
+	  `${time.getHours().toString().padStart(2, '0')}:${time.getMinutes().toString().padStart(2, '0')}`
+	);
+	let currentDate = $derived(time.toDateString());
+
 
 	$effect(() => {
 		pause = player.paused;
 		console.log(player);
+	});
+
+	onMount(() => {
+		const interval = setInterval(() => {
+			time = new Date();
+		})
+
+		return () => {
+			clearInterval(interval);
+		}
 	});
 
 
@@ -69,7 +86,7 @@
 				<div class="hero-content flex-col w-full min-h-full">
 					<div
 						class="card  max-w-sm shrink-0 shadow-2xl bg-blur"
-						transition:fly={{ y: -400 }}
+						transition:fly={{ y: -400}}
 					>
 						<div class="card-body rounded-lg w-80 lg:w-96 backdrop-blur-3xl">
 							<div class="flex justify-end">
@@ -156,8 +173,14 @@
 					<CircleChevronDown />
 				</button>
 			</div>
+			<div class="flex justify-end px-10">
+				<div class="flex flex-col p-4 rounded-lg backdrop-blur-3xl text-white" transition:blur >
+					<div class="flex justify-end text-3xl bold">{currentTime}</div>
+					<div class="text-xl">{currentDate}</div>
+				</div>
+			</div>
 		</main>
-		<footer class="text-center text-xs text-gray-500 p-3">
+		<footer class="text-center text-xs text-gray-500 p-3" transition:blur>
 			<span
 				>Dev by ✨ <a href="mailto:meshchaninov.n@gmail.com" class="link">Nikita Meshchaninov</a
 				></span
