@@ -3,8 +3,20 @@
 	import { onMount } from 'svelte';
 	import { fly, blur } from 'svelte/transition';
 
-	const rainSrc = ['./audio/rain1.mp3', './audio/rain2.mp3', './audio/rain3.mp3', './audio/rain4.mp3', './audio/rain5.mp3'];
-	const backgroundSrc = ['./video/rain1.webm', './video/rain2.webm', './video/rain3.webm', './video/rain4.webm', './video/rain5.webm'];
+	const rainSrc = [
+		'./audio/rain1.mp3',
+		'./audio/rain2.mp3',
+		'./audio/rain3.mp3',
+		'./audio/rain4.mp3',
+		'./audio/rain5.mp3'
+	];
+	const backgroundSrc = [
+		{ video: './video/rain1.webm', preview: '/video/preview/preview1.webp'},
+		{ video: './video/rain2.webm', preview: './video/preview/preview2.webp' },
+		{ video: './video/rain3.webm', preview: './video/preview/preview3.webp' },
+		{ video: './video/rain4.webm', preview: './video/preview/preview4.webp' },
+		{ video: './video/rain5.webm', preview: './video/preview/preview5.webp' }
+	];
 
 	let player;
 
@@ -15,10 +27,9 @@
 	let menuHidden = $state(false);
 	let time = $state(new Date());
 	let currentTime = $derived(
-	  `${time.getHours().toString().padStart(2, '0')}:${time.getMinutes().toString().padStart(2, '0')}`
+		`${time.getHours().toString().padStart(2, '0')}:${time.getMinutes().toString().padStart(2, '0')}`
 	);
 	let currentDate = $derived(time.toDateString());
-
 
 	$effect(() => {
 		pause = player.paused;
@@ -27,16 +38,15 @@
 	onMount(() => {
 		const interval = setInterval(() => {
 			time = new Date();
-		})
+		});
 
 		currentAudioSrc = rainSrc[Math.floor(Math.random() * rainSrc.length)];
 		currentBgSrc = backgroundSrc[Math.floor(Math.random() * backgroundSrc.length)];
 
 		return () => {
 			clearInterval(interval);
-		}
+		};
 	});
-
 
 	function setPause() {
 		pause = !pause;
@@ -60,9 +70,8 @@
 		content="Welcome to Rain Sound Oasis, your ultimate destination for relaxation and tranquility. Immerse yourself in the soothing symphony of rain, designed to help you unwind, focus, or drift into a peaceful sleep."
 	/>
 	<meta property="og:image" content="/previewImage.webp" />
-	<meta name="twitter:card" content="summary_large_image">
+	<meta name="twitter:card" content="summary_large_image" />
 	<script defer data-domain="just-rain.win" src="https://plausible.dzle.org/js/script.js"></script>
-
 </svelte:head>
 
 <section>
@@ -74,10 +83,11 @@
 			loop
 			playsinline
 			disablepictureinpicture
-			src={currentBgSrc}
+			src={currentBgSrc.video}
+			poster={currentBgSrc.preview}
 		/>
 	</div>
-	<audio bind:this={player} bind:paused={pause} bind:volume={volume} autoplay loop src={currentAudioSrc} />
+	<audio bind:this={player} bind:paused={pause} bind:volume autoplay loop src={currentAudioSrc} />
 </section>
 
 <div class="min-w-fit h-svh flex flex-col">
@@ -85,10 +95,7 @@
 		<main class="h-full">
 			<div class="hero min-h-svh">
 				<div class="hero-content flex-col w-full min-h-full">
-					<div
-						class="card  max-w-sm shrink-0 shadow-2xl bg-blur"
-						transition:fly={{ y: -400}}
-					>
+					<div class="card max-w-sm shrink-0 shadow-2xl bg-blur" transition:fly={{ y: -400 }}>
 						<div class="card-body rounded-lg w-80 lg:w-96 backdrop-blur-3xl">
 							<div class="flex justify-end">
 								<button class="btn btn-xs btn-ghost btn-circle" onclick={() => showMenu()}>
@@ -150,7 +157,7 @@
 											{#each backgroundSrc as _, i}
 												<button
 													class="btn btn-sm"
-													class:btn-active={currentBgSrc === backgroundSrc[i]}
+													class:btn-active={currentBgSrc.video === backgroundSrc[i].video}
 													onclick={() => (currentBgSrc = backgroundSrc[i])}>{i + 1}</button
 												>
 											{/each}
@@ -175,7 +182,7 @@
 				</button>
 			</div>
 			<div class="flex justify-end px-10">
-				<div class="flex flex-col p-4 rounded-lg backdrop-blur-3xl text-white" transition:blur >
+				<div class="flex flex-col p-4 rounded-lg backdrop-blur-3xl text-white" transition:blur>
 					<div class="flex justify-end text-3xl bold">{currentTime}</div>
 					<div class="text-xl">{currentDate}</div>
 				</div>
