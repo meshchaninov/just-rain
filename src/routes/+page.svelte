@@ -61,29 +61,21 @@
 	/>
 	<meta property="og:image" content="/previewImage.webp" />
 	<meta name="twitter:card" content="summary_large_image">
-	{#each backgroundSrc as src}
-		<link rel="preload" href={src} as="image" />
-	{/each}
 	<script defer data-domain="just-rain.win" src="https://plausible.dzle.org/js/script.js"></script>
 
 </svelte:head>
 
 <section>
 	<div class="absolute w-full h-full object-cover -z-10">
-		{#await currentBgSrc}
-			<div class="absolute skeleton w-full h-full" />
-		{:then src}
-			<video
-				class="absolute w-full h-full object-cover -z-10"
-				muted
-				autoplay
-				loop
-				playsinline
-				disablepictureinpicture
-				preload="none"
-				{src}
-			/>
-		{/await}
+		<video
+			class="absolute w-full h-full object-cover -z-10"
+			muted
+			autoplay
+			loop
+			playsinline
+			disablepictureinpicture
+			src={currentBgSrc}
+		/>
 	</div>
 	<audio bind:this={player} bind:paused={pause} bind:volume={volume} autoplay loop src={currentAudioSrc} />
 </section>
