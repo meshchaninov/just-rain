@@ -11,7 +11,7 @@
 	let pause = $state(player?.paused);
 	let volume = $state(0.8);
 	let currentAudioSrc = $state(rainSrc[0]);
-	let currentBgSrc = $state(backgroundSrc[4]);
+	let currentBgSrc = $state(backgroundSrc[0]);
 	let menuHidden = $state(false);
 	let time = $state(new Date());
 	let currentTime = $derived(
@@ -28,6 +28,9 @@
 		const interval = setInterval(() => {
 			time = new Date();
 		})
+
+		currentAudioSrc = rainSrc[Math.floor(Math.random() * rainSrc.length)];
+		currentBgSrc = backgroundSrc[Math.floor(Math.random() * backgroundSrc.length)];
 
 		return () => {
 			clearInterval(interval);
@@ -59,7 +62,7 @@
 	<meta property="og:image" content="/previewImage.webp" />
 	<meta name="twitter:card" content="summary_large_image">
 	{#each backgroundSrc as src}
-		<link rel="preload" href={src} as="video" type="video/webm" />
+		<link rel="preload" href={src} as="image" />
 	{/each}
 	<script defer data-domain="just-rain.win" src="https://plausible.dzle.org/js/script.js"></script>
 
