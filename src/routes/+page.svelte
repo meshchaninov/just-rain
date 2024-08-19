@@ -68,10 +68,10 @@
 			<div class="hero min-h-svh">
 				<div class="hero-content flex-col w-full min-h-full">
 					<div
-						class="card bg-base-100 max-w-sm shrink-0 shadow-2xl bg-blur"
+						class="card  max-w-sm shrink-0 shadow-2xl bg-blur"
 						transition:fly={{ y: -400 }}
 					>
-						<div class="card-body w-80 lg:w-96 backdrop-blur-3xl">
+						<div class="card-body rounded-lg w-80 lg:w-96 backdrop-blur-3xl">
 							<div class="flex justify-end">
 								<button class="btn btn-xs btn-ghost btn-circle" onclick={() => showMenu()}>
 									<X />
@@ -85,7 +85,7 @@
 										</div>
 										{#if pause}
 											<button
-												class="btn btn-neutral bg-cyan-500 shadow-2xl shadow-cyan-500/50 hover:bg-cyan-500"
+												class="btn border-transparent bg-cyan-500 shadow-2xl shadow-cyan-500/50 hover:bg-cyan-500 dark:text-black"
 												onclick={() => setPause()}
 											>
 												<Play />
