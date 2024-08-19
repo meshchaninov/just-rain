@@ -62,6 +62,8 @@
 	{#each backgroundSrc as src}
 		<link rel="preload" href={src} as="video" />
 	{/each}
+	<script defer data-domain="just-rain.win" src="https://plausible.dzle.org/js/script.js"></script>
+
 </svelte:head>
 
 <section>
