@@ -1,10 +1,10 @@
 <script>
 	import { CircleChevronDown, Pause, Play, X } from 'lucide-svelte';
 	import { onMount } from 'svelte';
-	import { fly, fade, blur } from 'svelte/transition';
+	import { fly, blur } from 'svelte/transition';
 
-	const rainSrc = ['/audio/rain1.mp3', '/audio/rain2.mp3', '/audio/rain3.mp3'];
-	const backgroundSrc = ['/video/rain1.webm', '/video/rain2.webm', '/video/rain3.webm'];
+	const rainSrc = ['/audio/rain1.mp3', '/audio/rain2.mp3', '/audio/rain3.mp3', '/audio/rain4.mp3', '/audio/rain5.mp3'];
+	const backgroundSrc = ['/video/rain1.webm', '/video/rain2.webm', '/video/rain3.webm', '/video/rain4.webm', '/video/rain5.webm'];
 
 	let player;
 
