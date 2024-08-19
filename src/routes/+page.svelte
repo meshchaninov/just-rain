@@ -12,7 +12,7 @@
 	let volume = $state(0.8);
 	let currentAudioSrc = $state(rainSrc[0]);
 	let currentBgSrc = $state(backgroundSrc[1]);
-	let menuHidden = $state(true);
+	let menuHidden = $state(false);
 	let time = $state(new Date());
 	let currentTime = $derived(
 	  `${time.getHours().toString().padStart(2, '0')}:${time.getMinutes().toString().padStart(2, '0')}`
