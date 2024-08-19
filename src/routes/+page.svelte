@@ -3,15 +3,15 @@
 	import { onMount } from 'svelte';
 	import { fly, blur } from 'svelte/transition';
 
-	const rainSrc = ['/audio/rain1.mp3', '/audio/rain2.mp3', '/audio/rain3.mp3', '/audio/rain4.mp3', '/audio/rain5.mp3'];
-	const backgroundSrc = ['/video/rain1.webm', '/video/rain2.webm', '/video/rain3.webm', '/video/rain4.webm', '/video/rain5.webm'];
+	const rainSrc = ['./audio/rain1.mp3', './audio/rain2.mp3', './audio/rain3.mp3', './audio/rain4.mp3', './audio/rain5.mp3'];
+	const backgroundSrc = ['./video/rain1.webm', './video/rain2.webm', './video/rain3.webm', './video/rain4.webm', './video/rain5.webm'];
 
 	let player;
 
 	let pause = $state(player?.paused);
 	let volume = $state(0.8);
 	let currentAudioSrc = $state(rainSrc[0]);
-	let currentBgSrc = $state(backgroundSrc[1]);
+	let currentBgSrc = $state(backgroundSrc[4]);
 	let menuHidden = $state(false);
 	let time = $state(new Date());
 	let currentTime = $derived(
@@ -22,7 +22,6 @@
 
 	$effect(() => {
 		pause = player.paused;
-		console.log(player);
 	});
 
 	onMount(() => {
@@ -60,7 +59,7 @@
 	<meta property="og:image" content="/previewImage.webp" />
 	<meta name="twitter:card" content="summary_large_image">
 	{#each backgroundSrc as src}
-		<link rel="preload" href={src} as="video" />
+		<link rel="preload" href={src} as="video" type="video/webm" />
 	{/each}
 	<script defer data-domain="just-rain.win" src="https://plausible.dzle.org/js/script.js"></script>
 
@@ -78,6 +77,7 @@
 				loop
 				playsinline
 				disablepictureinpicture
+				preload="none"
 				{src}
 			/>
 		{/await}
