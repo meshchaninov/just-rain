@@ -1,6 +1,5 @@
 <script>
-	import { CircleChevronDown, Pause, Play, X, Star } from 'lucide-svelte';
-	import { onMount } from 'svelte';
+	import { CircleChevronDown, Pause, Play, X } from 'lucide-svelte';
 	import { fly } from 'svelte/transition';
 
 	const rainSrc = ['/audio/rain1.mp3', '/audio/rain2.mp3', '/audio/rain3.mp3'];
@@ -8,18 +7,15 @@
 
 	let player;
 
-	let pause = $state(true);
-	let volume = $state(80);
-	let currentAudioSrcIndx = $state(0);
-	let currentBgSrcIndx = $state(1);
+	let pause = $state(player?.paused);
+	let volume = $state(0.8);
+	let currentAudioSrc = $state(rainSrc[0]);
+	let currentBgSrc = $state(backgroundSrc[1]);
 	let menuHidden = $state(false);
 
-	onMount(() => {
-		player.pause();
-	});
-
 	$effect(() => {
-		player.volume = volume / 100;
+		pause = player.paused;
+		console.log(player);
 	});
 
 
@@ -40,42 +36,66 @@
 <svelte:head>
 	<title>Just Rain</title>
 	<meta property="og:title" content="Just Rain" />
-	<meta property="og:description"
-		content="Welcome to Rain Sound Oasis, your ultimate destination for relaxation and tranquility. Immerse yourself in the soothing symphony of rain, designed to help you unwind, focus, or drift into a peaceful sleep." />
+	<meta
+		property="og:description"
+		content="Welcome to Rain Sound Oasis, your ultimate destination for relaxation and tranquility. Immerse yourself in the soothing symphony of rain, designed to help you unwind, focus, or drift into a peaceful sleep."
+	/>
 	<meta property="og:image" content="/previewImage.webp" />
 </svelte:head>
 
 <section>
-	<video
-		class="absolute w-full h-full object-cover -z-10"
-		muted
-		autoplay
-		loop
-		playsinline
-		disablepictureinpicture
-		src={backgroundSrc[currentBgSrcIndx]}
-	/>
-	<audio bind:this={player} loop autoplay src={rainSrc[currentAudioSrcIndx]} />
+	<div class="absolute w-full h-full object-cover -z-10">
+		{#await currentBgSrc}
+			<div class="absolute skeleton w-full h-full" />
+		{:then src}
+			<video
+				class="absolute w-full h-full object-cover -z-10"
+				muted
+				autoplay
+				loop
+				playsinline
+				disablepictureinpicture
+				{src}
+			/>
+		{/await}
+	</div>
+	<audio bind:this={player} bind:paused={pause} bind:volume={volume} autoplay loop src={currentAudioSrc} />
 </section>
 
 <div class="min-w-fit h-svh flex flex-col">
 	{#if !menuHidden}
 		<main class="h-full">
-			<div class="hero min-h-screen">
+			<div class="hero min-h-svh">
 				<div class="hero-content flex-col w-full min-h-full">
 					<div
-						class="card bg-base-100 max-w-sm shrink-0 shadow-2xl"
+						class="card bg-base-100 max-w-sm shrink-0 shadow-2xl bg-blur"
 						transition:fly={{ y: -400 }}
 					>
-						<div class="card-body w-80 lg:w-96">
+						<div class="card-body w-80 lg:w-96 backdrop-blur-3xl">
 							<div class="flex justify-end">
-								<button class="btn btn-sm btn-ghost btn-circle" onclick={() => showMenu()}>
-									<X class="w-6 h-6" />
+								<button class="btn btn-xs btn-ghost btn-circle" onclick={() => showMenu()}>
+									<X />
 								</button>
 							</div>
 							<div>
-								<h2 class="text-xl font-bold">Rain control</h2>
 								<div class="flex flex-col justify-items-center">
+									<div class="form-control">
+										<div class="label">
+											<span class="label-text">Playing</span>
+										</div>
+										{#if pause}
+											<button
+												class="btn btn-neutral bg-cyan-500 shadow-2xl shadow-cyan-500/50 hover:bg-cyan-500"
+												onclick={() => setPause()}
+											>
+												<Play />
+											</button>
+										{:else}
+											<button class="btn" onclick={() => setPause()}>
+												<Pause />
+											</button>
+										{/if}
+									</div>
 									<div class="form-control">
 										<label class="label">
 											<span class="label-text">Volume</span>
@@ -83,27 +103,13 @@
 										<input
 											type="range"
 											min="0"
-											max="100"
-											class="range"
+											max="1"
+											step="0.01"
+											class="range range-xs"
 											bind:value={volume}
 										/>
 									</div>
 
-									<div class="form-control">
-										<div class="label">
-											<span class="label-text">Playing</span>
-										</div>
-
-										{#if pause}
-											<button class="btn btn-sm" onclick={() => setPause()}>
-												<Play />
-											</button>
-										{:else}
-											<button class="btn btn-sm" onclick={() => setPause()}>
-												<Pause />
-											</button>
-										{/if}
-									</div>
 									<div class="form-control">
 										<label class="label">
 											<span class="label-text">Select audio</span>
@@ -112,9 +118,8 @@
 											{#each rainSrc as _, i}
 												<button
 													class="btn btn-sm"
-													class:btn-active={currentAudioSrcIndx === i}
-													disabled={pause}
-													onclick={() => (currentAudioSrcIndx = i)}>{i + 1}</button
+													class:btn-active={currentAudioSrc === rainSrc[i]}
+													onclick={() => (currentAudioSrc = rainSrc[i])}>{i + 1}</button
 												>
 											{/each}
 										</div>
@@ -127,8 +132,8 @@
 											{#each backgroundSrc as _, i}
 												<button
 													class="btn btn-sm"
-													class:btn-active={currentBgSrcIndx === i}
-													onclick={() => (currentBgSrcIndx = i)}>{i + 1}</button
+													class:btn-active={currentBgSrc === backgroundSrc[i]}
+													onclick={() => (currentBgSrc = backgroundSrc[i])}>{i + 1}</button
 												>
 											{/each}
 										</div>
