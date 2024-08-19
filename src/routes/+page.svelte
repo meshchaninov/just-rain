@@ -108,7 +108,7 @@
 										</div>
 										{#if pause}
 											<button
-												class="btn border-transparent bg-cyan-500 shadow-2xl shadow-cyan-500/50 hover:bg-cyan-500 dark:text-black"
+												class="btn border-transparent bg-cyan-500 shadow-2xl shadow-cyan-500/50 hover:bg-cyan-500 text-black"
 												onclick={() => setPause()}
 											>
 												<Play />
