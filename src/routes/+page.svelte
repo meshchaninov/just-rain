@@ -58,6 +58,7 @@
 		content="Welcome to Rain Sound Oasis, your ultimate destination for relaxation and tranquility. Immerse yourself in the soothing symphony of rain, designed to help you unwind, focus, or drift into a peaceful sleep."
 	/>
 	<meta property="og:image" content="/previewImage.webp" />
+	<meta name="twitter:card" content="summary_large_image">
 	{#each backgroundSrc as src}
 		<link rel="preload" href={src} as="video" />
 	{/each}
