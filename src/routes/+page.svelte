@@ -33,7 +33,7 @@
 	$effect(() => {
 		if (fullScreen) {
 			document.documentElement.requestFullscreen();
-		} else {
+		} else if (!fullScreen) {
 			document.exitFullscreen();
 		}
 	})
@@ -60,6 +60,26 @@
 	function showMenu() {
 		menuHidden = !menuHidden;
 	}
+
+	function onFullScreenChange() {
+					if (document.fullscreenElement) {
+				fullScreen = true
+			} else {
+				fullScreen = false
+			}
+
+	}
+
+	function toggleFullScreen() {
+		if (!document.fullscreenElement) {
+			document.documentElement.requestFullscreen();
+			fullScreen = true;
+		} else if (document.exitFullscreen) {
+			document.exitFullscreen();
+			fullScreen = false;
+		}
+	}
+
 
 	/**
 	 * Shuffles array in place.
@@ -88,6 +108,8 @@
 	<meta name="twitter:card" content="summary_large_image" />
 	<script defer data-domain="just-rain.win" src="https://plausible.dzle.org/js/script.js"></script>
 </svelte:head>
+
+<svelte:document on:fullscreenchange={onFullScreenChange} />
 
 <PlayerSection
 	bgSrcVideo={currentBgSrc.media}
