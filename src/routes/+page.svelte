@@ -6,14 +6,13 @@
 	import PlayerSection from './PlayerSection.svelte';
 
 	const rainSrc = Media['audio'];
-	const backgroundSrc = Media['video'];
+	const backgroundSrc = shuffleArray(Media['video']);
 
-	const bgTimeChange = 30;
-	const shuffledBg = shuffleArray(backgroundSrc);
+	const bgTimeChange = 60;
 
 	let player = $state(null);
 
-	let pause = $state(player?.paused);
+	let pause = $state(player?.paused || true);
 	let volume = $state(0.8);
 	let currentAudioSrc = $state(rainSrc[0]);
 	let currentBgSrc = $state(backgroundSrc[0]);
@@ -33,8 +32,8 @@
 		const interval = setInterval(() => {
 			bgTimeLeft -= 1;
 			if (bgTimeLeft <= 0) {
-				currentBgIndex = nextIndex(shuffledBg, currentBgIndex);
-				currentBgSrc = shuffledBg[currentBgIndex];
+				currentBgIndex = nextIndex(backgroundSrc, currentBgIndex);
+				currentBgSrc = backgroundSrc[currentBgIndex];
 				bgTimeLeft = bgTimeChange;
 			}
 		}, 1000);
