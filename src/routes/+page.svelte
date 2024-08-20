@@ -1,7 +1,8 @@
 <script>
-	import { CircleChevronDown, Pause, Play, X } from 'lucide-svelte';
 	import { onMount } from 'svelte';
-	import { fly, blur } from 'svelte/transition';
+	import Menu from './Menu.svelte';
+	import Screensaver from './Screensaver.svelte';
+	import PlayerSection from './PlayerSection.svelte';
 
 	const rainSrc = [
 		'./audio/rain1.mp3',
@@ -25,37 +26,20 @@
 	let currentAudioSrc = $state(rainSrc[0]);
 	let currentBgSrc = $state(backgroundSrc[0]);
 	let menuHidden = $state(false);
-	let time = $state(new Date());
-	let currentTime = $derived(
-		`${time.getHours().toString().padStart(2, '0')}:${time.getMinutes().toString().padStart(2, '0')}`
-	);
-	let currentDate = $derived(time.toDateString());
 
 	$effect(() => {
-		pause = player.paused;
-	});
-
-	onMount(() => {
-		const interval = setInterval(() => {
-			time = new Date();
-		});
-
-		currentAudioSrc = rainSrc[Math.floor(Math.random() * rainSrc.length)];
-		currentBgSrc = backgroundSrc[Math.floor(Math.random() * backgroundSrc.length)];
-
-		return () => {
-			clearInterval(interval);
-		};
-	});
-
-	function setPause() {
-		pause = !pause;
 		if (pause) {
 			player.pause();
 		} else {
 			player.play();
 		}
-	}
+	});
+
+	onMount(() => {
+		currentAudioSrc = rainSrc[Math.floor(Math.random() * rainSrc.length)];
+		currentBgSrc = backgroundSrc[Math.floor(Math.random() * backgroundSrc.length)];
+		pause = player.paused;
+	});
 
 	function showMenu() {
 		menuHidden = !menuHidden;
@@ -74,125 +58,20 @@
 	<script defer data-domain="just-rain.win" src="https://plausible.dzle.org/js/script.js"></script>
 </svelte:head>
 
-<section>
-	<div class="absolute w-full h-full object-cover -z-10">
-		<video
-			class="absolute w-full h-full object-cover -z-10"
-			muted
-			autoplay
-			loop
-			playsinline
-			disablepictureinpicture
-			src={currentBgSrc.video}
-			poster={currentBgSrc.preview}
-		/>
-	</div>
-	<audio bind:this={player} bind:paused={pause} bind:volume autoplay loop src={currentAudioSrc} />
-</section>
+<PlayerSection
+	bgSrcVideo={currentBgSrc.video}
+	bgSrcPreview={currentBgSrc.preview}
+	audioSrc={currentAudioSrc}
+	bind:volume={volume}
+	bind:pause={pause}
+	bind:player={player} 
+/>
 
 <div class="min-w-fit h-svh flex flex-col">
 	{#if !menuHidden}
-		<main class="h-full">
-			<div class="hero min-h-svh">
-				<div class="hero-content flex-col w-full min-h-full">
-					<div class="card max-w-sm shrink-0 shadow-2xl bg-blur" transition:fly={{ y: -400 }}>
-						<div class="card-body rounded-lg w-80 lg:w-96 backdrop-blur-3xl">
-							<div class="flex justify-end">
-								<button class="btn btn-xs btn-ghost btn-circle" onclick={() => showMenu()}>
-									<X />
-								</button>
-							</div>
-							<div>
-								<div class="flex flex-col justify-items-center">
-									<div class="form-control">
-										<div class="label">
-											<span class="label-text">Playing</span>
-										</div>
-										{#if pause}
-											<button
-												class="btn border-transparent bg-cyan-500 shadow-2xl shadow-cyan-500/50 hover:bg-cyan-500 text-black"
-												onclick={() => setPause()}
-											>
-												<Play />
-											</button>
-										{:else}
-											<button class="btn" onclick={() => setPause()}>
-												<Pause />
-											</button>
-										{/if}
-									</div>
-									<div class="form-control">
-										<label class="label">
-											<span class="label-text">Volume</span>
-										</label>
-										<input
-											type="range"
-											min="0"
-											max="1"
-											step="0.01"
-											class="range range-xs"
-											bind:value={volume}
-										/>
-									</div>
-
-									<div class="form-control">
-										<label class="label">
-											<span class="label-text">Select audio</span>
-										</label>
-										<div class="flex justify-center gap-2">
-											{#each rainSrc as _, i}
-												<button
-													class="btn btn-sm"
-													class:btn-active={currentAudioSrc === rainSrc[i]}
-													onclick={() => (currentAudioSrc = rainSrc[i])}>{i + 1}</button
-												>
-											{/each}
-										</div>
-									</div>
-									<div class="form-control">
-										<label class="label">
-											<span class="label-text">Select background</span>
-										</label>
-										<div class="flex justify-center gap-2">
-											{#each backgroundSrc as _, i}
-												<button
-													class="btn btn-sm"
-													class:btn-active={currentBgSrc.video === backgroundSrc[i].video}
-													onclick={() => (currentBgSrc = backgroundSrc[i])}>{i + 1}</button
-												>
-											{/each}
-										</div>
-									</div>
-								</div>
-							</div>
-						</div>
-					</div>
-				</div>
-			</div>
-		</main>
+		<Menu rainSrc={rainSrc} backgroundSrc={backgroundSrc} showMenu={showMenu} bind:currentAudioSrc bind:currentBgSrc bind:pause bind:volume />
 	{:else}
-		<main class="flex-1">
-			<div class="flex justify-center pt-3">
-				<button
-					class="btn btn-circle btn-ghost"
-					onclick={() => showMenu()}
-					in:fly={{ y: 20, delay: 500 }}
-				>
-					<CircleChevronDown />
-				</button>
-			</div>
-			<div class="flex justify-end px-10">
-				<div class="flex flex-col p-4 rounded-lg backdrop-blur-3xl text-white" transition:blur>
-					<div class="flex justify-end text-3xl bold">{currentTime}</div>
-					<div class="text-xl">{currentDate}</div>
-				</div>
-			</div>
-		</main>
-		<footer class="text-center text-xs text-gray-500 p-3" transition:blur>
-			<span
-				>Dev by ✨ <a href="mailto:meshchaninov.n@gmail.com" class="link">Nikita Meshchaninov</a
-				></span
-			>
-		</footer>
+		<Screensaver showMenu={showMenu} />
+		
 	{/if}
 </div>
