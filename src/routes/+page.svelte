@@ -1,23 +1,12 @@
 <script>
 	import { onMount } from 'svelte';
+	import Media from '$lib/media.json';
 	import Menu from './Menu.svelte';
 	import Screensaver from './Screensaver.svelte';
 	import PlayerSection from './PlayerSection.svelte';
 
-	const rainSrc = [
-		'./audio/rain1.mp3',
-		'./audio/rain2.mp3',
-		'./audio/rain3.mp3',
-		'./audio/rain4.mp3',
-		'./audio/rain5.mp3'
-	];
-	const backgroundSrc = [
-		{ video: './video/rain1.webm', preview: '/video/preview/preview1.webp' },
-		{ video: './video/rain2.webm', preview: './video/preview/preview2.webp' },
-		{ video: './video/rain3.webm', preview: './video/preview/preview3.webp' },
-		{ video: './video/rain4.webm', preview: './video/preview/preview4.webp' },
-		{ video: './video/rain5.webm', preview: './video/preview/preview5.webp' }
-	];
+	const rainSrc = Media['audio'];
+	const backgroundSrc = Media['video'];
 
 	const bgTimeChange = 30;
 	const shuffledBg = shuffleArray(backgroundSrc);
@@ -50,8 +39,7 @@
 			}
 		}, 1000);
 
-		currentAudioSrc = rainSrc[Math.floor(Math.random() * rainSrc.length)];
-		currentBgSrc = backgroundSrc[Math.floor(Math.random() * backgroundSrc.length)];
+
 		pause = player?.paused || true;
 
 		return () => {
@@ -98,7 +86,7 @@
 </svelte:head>
 
 <PlayerSection
-	bgSrcVideo={currentBgSrc.video}
+	bgSrcVideo={currentBgSrc.media}
 	bgSrcPreview={currentBgSrc.preview}
 	audioSrc={currentAudioSrc}
 	bind:volume
