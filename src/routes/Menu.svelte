@@ -1,5 +1,6 @@
 <script>
 	import { Pause, Play, X } from 'lucide-svelte';
+	import { onMount } from 'svelte';
 	import { blur, fly } from 'svelte/transition';
 
 	let {
