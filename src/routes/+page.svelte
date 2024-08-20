@@ -11,7 +11,6 @@
 
 	let shuffleBgSrc = $derived(shuffle(backgroundSrc));
 
-
 	let player = $state(null);
 
 	let pause = $state(player?.paused || true);
@@ -41,7 +40,7 @@
 		}, 1000);
 
 		pause = player?.paused || true;
-		console.log("Shuffled background sources", shuffleBgSrc);
+		console.log('Shuffled background sources', shuffleBgSrc);
 
 		return () => {
 			player.pause();
@@ -91,9 +90,9 @@
 />
 
 <div class="min-w-fit h-svh flex flex-col">
-	{#if !menuHidden}
-		<Menu {rainSrc} {showMenu} bind:currentAudioSrc bind:pause bind:volume />
-	{:else}
+	{#if menuHidden}
 		<Screensaver {showMenu} />
+	{:else}
+		<Menu {rainSrc} {showMenu} bind:currentAudioSrc bind:pause bind:volume />
 	{/if}
 </div>
