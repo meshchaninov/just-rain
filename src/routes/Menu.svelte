@@ -13,6 +13,10 @@
 	function setPause() {
 		pause = !pause;
 	}
+	
+	function setCurrentAudioSrc(src) {
+		currentAudioSrc = src;
+	}
 </script>
 
 <div>
@@ -34,7 +38,7 @@
 									</div>
 									{#if pause}
 										<button
-											class="btn border-transparent bg-cyan-500 shadow-2xl shadow-cyan-500/50 hover:bg-cyan-500 text-black"
+											class="inline-flex items-center justify-center py-3 pyx-6 font-dm rounded-lg shadow-lg shadow-cyan-500/50 bg-cyan-500  hover:bg-cyan-500 text-black"
 											onclick={() => setPause()}
 										>
 											<Play />
@@ -68,7 +72,7 @@
 											<button
 												class="btn btn-sm"
 												class:btn-active={currentAudioSrc === rainSrc[i]}
-												onclick={() => (currentAudioSrc = rainSrc[i])}>{i + 1}</button
+												onclick={() => setCurrentAudioSrc(rainSrc[i])}>{i + 1}</button
 											>
 										{/each}
 									</div>

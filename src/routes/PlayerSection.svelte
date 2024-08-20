@@ -14,5 +14,5 @@
 			poster={bgSrcPreview}
 		/>
 	</div>
-	<audio bind:this={player} bind:paused={pause} bind:volume loop src={audioSrc} />
+	<audio bind:this={player} bind:paused={pause} bind:volume loop autoplay src={audioSrc} />
 </section>
