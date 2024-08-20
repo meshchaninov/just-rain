@@ -19,7 +19,7 @@
 		{ video: './video/rain5.webm', preview: './video/preview/preview5.webp' }
 	];
 
-	const bgTimeChange = 60 * 100;
+	const bgTimeChange = 30;
 	const shuffledBg = shuffleArray(backgroundSrc);
 
 	let player = $state(null);
@@ -48,7 +48,7 @@
 				currentBgSrc = shuffledBg[currentBgIndex];
 				bgTimeLeft = bgTimeChange;
 			}
-		});
+		}, 1000);
 
 		currentAudioSrc = rainSrc[Math.floor(Math.random() * rainSrc.length)];
 		currentBgSrc = backgroundSrc[Math.floor(Math.random() * backgroundSrc.length)];
