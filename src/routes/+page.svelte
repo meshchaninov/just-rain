@@ -9,7 +9,7 @@
 	const rainSrc = Media['audio'];
 	const backgroundSrc = Media['video'];
 
-	let shuffleBgSrc = $derived(shuffleArray(backgroundSrc));
+	let shuffleBgSrc = $derived(shuffle(backgroundSrc));
 
 
 	let player = $state(null);
@@ -17,7 +17,7 @@
 	let pause = $state(player?.paused || true);
 	let volume = $state(0.8);
 	let currentAudioSrc = $state(rainSrc[0]);
-	let currentBgSrc = $state(backgroundSrc[0]);
+	let currentBgSrc = $state(backgroundSrc[randomIndex(backgroundSrc)]);
 	let menuHidden = $state(false);
 	let bgTimeLeft = $state(bgTimeChange);
 	let currentBgIndex = $state(0);
@@ -34,14 +34,14 @@
 		const interval = setInterval(() => {
 			bgTimeLeft -= 1;
 			if (bgTimeLeft <= 0) {
-				currentBgIndex = nextIndex(shuffleBgSrc, currentBgIndex);
+				currentBgIndex = (currentBgIndex + 1) % shuffleBgSrc.length;
 				currentBgSrc = shuffleBgSrc[currentBgIndex];
 				bgTimeLeft = bgTimeChange;
 			}
 		}, 1000);
 
-
 		pause = player?.paused || true;
+		console.log("Shuffled background sources", shuffleBgSrc);
 
 		return () => {
 			player.pause();
@@ -53,24 +53,23 @@
 		menuHidden = !menuHidden;
 	}
 
-
-	function shuffleArray(array) {
-		let currentIndex = array.length;
-
-		// While there remain elements to shuffle...
-		while (currentIndex != 0) {
-			// Pick a remaining element...
-			let randomIndex = Math.floor(Math.random() * currentIndex);
-			currentIndex--;
-
-			// And swap it with the current element.
-			[array[currentIndex], array[randomIndex]] = [array[randomIndex], array[currentIndex]];
-		}
-		return array;
+	function randomIndex(array) {
+		return Math.floor(Math.random() * array.length);
 	}
 
-	function nextIndex(array, currentIndex) {
-		return (currentIndex + 1) % array.length;
+	/**
+	 * Shuffles array in place.
+	 * @param {Array} a items An array containing the items.
+	 */
+	function shuffle(a) {
+		var j, x, i;
+		for (i = a.length - 1; i > 0; i--) {
+			j = Math.floor(Math.random() * (i + 1));
+			x = a[i];
+			a[i] = a[j];
+			a[j] = x;
+		}
+		return a;
 	}
 </script>
 
