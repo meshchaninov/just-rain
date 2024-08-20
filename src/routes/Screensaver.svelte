@@ -41,7 +41,7 @@
 			</div>
 		</div>
 	</main>
-	<footer class="text-center text-xs text-gray-500 pb-6" in:blur={{ delay: 1000 }} out:blur>
+	<footer class="text-center text-xs text-gray-500 pb-3" in:blur={{ delay: 1000 }} out:blur>
 		<span
 			>Dev by ✨ <a href="mailto:meshchaninov.n@gmail.com" class="link">Nikita Meshchaninov</a
 			></span
