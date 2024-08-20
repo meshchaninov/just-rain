@@ -3,20 +3,20 @@
 
     let { bgSrcVideo, bgSrcPreview, audioSrc, volume = $bindable(), pause = $bindable(), player = $bindable() } = $props();
 
-	let audioCtx = null;
-	let gainNode = null;
+	// let audioCtx = null;
+	// let gainNode = null;
 
-	onMount(() => {
-		audioCtx = new window.AudioContext();
-		gainNode = audioCtx.createGain();
-		const source = audioCtx.createMediaElementSource(player);
-		source.connect(gainNode);
-		gainNode.connect(audioCtx.destination);
-	});
+	// onMount(() => {
+	// 	audioCtx = new window.AudioContext();
+	// 	gainNode = audioCtx.createGain();
+	// 	const source = audioCtx.createMediaElementSource(player);
+	// 	source.connect(gainNode);
+	// 	gainNode.connect(audioCtx.destination);
+	// });
 
-	$effect(() => {
-		gainNode.gain.value = volume;
-	});
+	// $effect(() => {
+	// 	gainNode.gain.value = volume;
+	// });
 
 
 </script>
@@ -33,5 +33,5 @@
 			poster={bgSrcPreview}
 		></video>	
 	</div>
-	<audio bind:this={player} bind:paused={pause} loop autoplay src={audioSrc} ></audio>
+	<audio bind:this={player} bind:paused={pause} bind:volume={volume} loop autoplay src={audioSrc} ></audio>
 </section>
