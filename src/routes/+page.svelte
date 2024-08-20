@@ -17,7 +17,7 @@
 	let pause = $state(player?.paused || true);
 	let volume = $state(0.8);
 	let currentAudioSrc = $state(rainSrc[0]);
-	let currentBgSrc = $state(backgroundSrc[randomIndex(backgroundSrc)]);
+	let currentBgSrc = $state(shuffleBgSrc[0]);
 	let menuHidden = $state(false);
 	let bgTimeLeft = $state(bgTimeChange);
 	let currentBgIndex = $state(0);
@@ -51,10 +51,6 @@
 
 	function showMenu() {
 		menuHidden = !menuHidden;
-	}
-
-	function randomIndex(array) {
-		return Math.floor(Math.random() * array.length);
 	}
 
 	/**
