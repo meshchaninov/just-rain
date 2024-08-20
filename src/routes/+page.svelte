@@ -12,20 +12,25 @@
 		'./audio/rain5.mp3'
 	];
 	const backgroundSrc = [
-		{ video: './video/rain1.webm', preview: '/video/preview/preview1.webp'},
+		{ video: './video/rain1.webm', preview: '/video/preview/preview1.webp' },
 		{ video: './video/rain2.webm', preview: './video/preview/preview2.webp' },
 		{ video: './video/rain3.webm', preview: './video/preview/preview3.webp' },
 		{ video: './video/rain4.webm', preview: './video/preview/preview4.webp' },
 		{ video: './video/rain5.webm', preview: './video/preview/preview5.webp' }
 	];
 
-	let player;
+	const bgTimeChange = 60 * 100;
+	const shuffledBg = shuffleArray(backgroundSrc);
+
+	let player = $state(null);
 
 	let pause = $state(player?.paused);
 	let volume = $state(0.8);
 	let currentAudioSrc = $state(rainSrc[0]);
 	let currentBgSrc = $state(backgroundSrc[0]);
 	let menuHidden = $state(false);
+	let bgTimeLeft = $state(bgTimeChange);
+	let currentBgIndex = $state(0);
 
 	$effect(() => {
 		if (pause) {
@@ -36,13 +41,47 @@
 	});
 
 	onMount(() => {
+		const interval = setInterval(() => {
+			bgTimeLeft -= 1;
+			if (bgTimeLeft <= 0) {
+				currentBgIndex = nextIndex(shuffledBg, currentBgIndex);
+				currentBgSrc = shuffledBg[currentBgIndex];
+				bgTimeLeft = bgTimeChange;
+			}
+		});
+
 		currentAudioSrc = rainSrc[Math.floor(Math.random() * rainSrc.length)];
 		currentBgSrc = backgroundSrc[Math.floor(Math.random() * backgroundSrc.length)];
-		pause = player.paused;
+		pause = player?.paused || true;
+
+		return () => {
+			player.pause();
+			clearInterval(interval);
+		};
 	});
 
 	function showMenu() {
 		menuHidden = !menuHidden;
+	}
+
+
+	function shuffleArray(array) {
+		let currentIndex = array.length;
+
+		// While there remain elements to shuffle...
+		while (currentIndex != 0) {
+			// Pick a remaining element...
+			let randomIndex = Math.floor(Math.random() * currentIndex);
+			currentIndex--;
+
+			// And swap it with the current element.
+			[array[currentIndex], array[randomIndex]] = [array[randomIndex], array[currentIndex]];
+		}
+		return array;
+	}
+
+	function nextIndex(array, currentIndex) {
+		return (currentIndex + 1) % array.length;
 	}
 </script>
 
@@ -62,16 +101,15 @@
 	bgSrcVideo={currentBgSrc.video}
 	bgSrcPreview={currentBgSrc.preview}
 	audioSrc={currentAudioSrc}
-	bind:volume={volume}
-	bind:pause={pause}
-	bind:player={player} 
+	bind:volume
+	bind:pause
+	bind:player
 />
 
 <div class="min-w-fit h-svh flex flex-col">
 	{#if !menuHidden}
-		<Menu rainSrc={rainSrc} backgroundSrc={backgroundSrc} showMenu={showMenu} bind:currentAudioSrc bind:currentBgSrc bind:pause bind:volume />
+		<Menu {rainSrc} {showMenu} bind:currentAudioSrc bind:pause bind:volume />
 	{:else}
-		<Screensaver showMenu={showMenu} />
-		
+		<Screensaver {showMenu} />
 	{/if}
 </div>

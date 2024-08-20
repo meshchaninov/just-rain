@@ -4,10 +4,8 @@
 
 	let {
 		rainSrc,
-		backgroundSrc,
         showMenu,
 		currentAudioSrc = $bindable(),
-		currentBgSrc = $bindable(),
 		pause = $bindable(),
 		volume = $bindable(),
 	} = $props();
@@ -72,20 +70,6 @@
 											class="btn btn-sm"
 											class:btn-active={currentAudioSrc === rainSrc[i]}
 											onclick={() => (currentAudioSrc = rainSrc[i])}>{i + 1}</button
-										>
-									{/each}
-								</div>
-							</div>
-							<div class="form-control">
-								<label class="label">
-									<span class="label-text">Select background</span>
-								</label>
-								<div class="flex justify-center gap-2">
-									{#each backgroundSrc as _, i}
-										<button
-											class="btn btn-sm"
-											class:btn-active={currentBgSrc.video === backgroundSrc[i].video}
-											onclick={() => (currentBgSrc = backgroundSrc[i])}>{i + 1}</button
 										>
 									{/each}
 								</div>

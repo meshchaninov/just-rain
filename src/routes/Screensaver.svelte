@@ -25,7 +25,7 @@
 <main class="flex-1">
 			<div class="flex justify-center pt-3">
 				<button
-					class="btn btn-circle btn-ghost"
+					class="btn btn-circle btn-ghost text-white"
 					onclick={() => showMenu()}
 					in:fly={{ y: 20, delay: 500 }}
 				>
