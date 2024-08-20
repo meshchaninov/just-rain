@@ -20,6 +20,7 @@
 	let menuHidden = $state(false);
 	let bgTimeLeft = $state(bgTimeChange);
 	let currentBgIndex = $state(0);
+	let fullScreen = $state(false);
 
 	$effect(() => {
 		if (pause) {
@@ -28,6 +29,14 @@
 			player.play();
 		}
 	});
+
+	$effect(() => {
+		if (fullScreen) {
+			document.documentElement.requestFullscreen();
+		} else {
+			document.exitFullscreen();
+		}
+	})
 
 	onMount(() => {
 		const interval = setInterval(() => {
@@ -93,6 +102,6 @@
 	{#if menuHidden}
 		<Screensaver {showMenu} />
 	{:else}
-		<Menu {rainSrc} {showMenu} bind:currentAudioSrc bind:pause bind:volume />
+		<Menu {rainSrc} {showMenu} bind:currentAudioSrc bind:pause bind:volume bind:fullScreen />
 	{/if}
 </div>

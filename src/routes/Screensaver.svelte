@@ -1,11 +1,10 @@
 <script>
 	import { CircleChevronDown } from 'lucide-svelte';
-	import { onDestroy, onMount } from 'svelte';
+	import { onMount } from 'svelte';
 	import { fly, blur } from 'svelte/transition';
 
 	let { showMenu } = $props();
 
-	const animationSpeed = 500;
 
 	let time = $state(new Date());
 	let currentTime = $derived(
@@ -42,7 +41,7 @@
 			</div>
 		</div>
 	</main>
-	<footer class="text-center text-xs text-gray-500 p-3" in:blur={{ delay: 1000 }} out:blur>
+	<footer class="text-center text-xs text-gray-500 pb-6" in:blur={{ delay: 1000 }} out:blur>
 		<span
 			>Dev by ✨ <a href="mailto:meshchaninov.n@gmail.com" class="link">Nikita Meshchaninov</a
 			></span

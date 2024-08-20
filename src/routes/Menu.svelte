@@ -1,15 +1,17 @@
 <script>
 	import { Pause, Play, X } from 'lucide-svelte';
-	import { onMount } from 'svelte';
-	import { blur, fly } from 'svelte/transition';
+	import { fly } from 'svelte/transition';
 
 	let {
 		rainSrc,
 		showMenu,
 		currentAudioSrc = $bindable(),
 		pause = $bindable(),
-		volume = $bindable()
+		volume = $bindable(),
+		fullScreen = $bindable()
 	} = $props();
+
+
 
 	function setPause() {
 		pause = !pause;
@@ -76,6 +78,14 @@
 												onclick={() => setCurrentAudioSrc(rainSrc[i])}>{i + 1}</button
 											>
 										{/each}
+									</div>
+								</div>
+								<div class="form-control">
+									<label class="label">
+										<span class="label-text">Full screen</span>
+									</label>
+									<div class="flex justify-center">
+										<input type="checkbox" class="toggle toggle-accent" bind:checked={fullScreen} />
 									</div>
 								</div>
 							</div>
