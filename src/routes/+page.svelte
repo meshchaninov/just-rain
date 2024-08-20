@@ -5,10 +5,12 @@
 	import Screensaver from './Screensaver.svelte';
 	import PlayerSection from './PlayerSection.svelte';
 
+	const bgTimeChange = 3 * 60;
 	const rainSrc = Media['audio'];
-	const backgroundSrc = shuffleArray(Media['video']);
+	const backgroundSrc = Media['video'];
 
-	const bgTimeChange = 60;
+	let shuffleBgSrc = $derived(shuffleArray(backgroundSrc));
+
 
 	let player = $state(null);
 
@@ -32,8 +34,8 @@
 		const interval = setInterval(() => {
 			bgTimeLeft -= 1;
 			if (bgTimeLeft <= 0) {
-				currentBgIndex = nextIndex(backgroundSrc, currentBgIndex);
-				currentBgSrc = backgroundSrc[currentBgIndex];
+				currentBgIndex = nextIndex(shuffleBgSrc, currentBgIndex);
+				currentBgSrc = shuffleBgSrc[currentBgIndex];
 				bgTimeLeft = bgTimeChange;
 			}
 		}, 1000);
