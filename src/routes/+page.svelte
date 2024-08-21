@@ -2,8 +2,11 @@
 	import { onMount } from 'svelte';
 	import Media from '$lib/media.json';
 	import Menu from './Menu.svelte';
-	import Screensaver from './Screensaver.svelte';
 	import PlayerSection from './PlayerSection.svelte';
+	import { blur, fly } from 'svelte/transition';
+	import { CircleChevronDown } from 'lucide-svelte';
+	import SCWidget from './SCWidget.svelte';
+	import { shuffle } from '$lib/utils';
 
 	const bgTimeChange = 3 * 60;
 	const rainSrc = Media['audio'];
@@ -17,10 +20,11 @@
 	let volume = $state(0.8);
 	let currentAudioSrc = $state(rainSrc[0]);
 	let currentBgSrc = $state('');
-	let menuHidden = $state(false);
+	let showMenu = $state(true);
 	let bgTimeLeft = $state(bgTimeChange);
 	let currentBgIndex = $state(0);
 	let fullScreen = $state(false);
+	let enableSC = $state(false);
 
 	$effect(() => {
 		if (pause) {
@@ -30,9 +34,9 @@
 		}
 	});
 
-
 	onMount(() => {
 		const interval = setInterval(() => {
+			time = new Date();
 			bgTimeLeft -= 1;
 			if (bgTimeLeft <= 0) {
 				currentBgIndex = (currentBgIndex + 1) % shuffleBgSrc.length;
@@ -57,21 +61,19 @@
 		} else if (!fullScreen && document.fullscreenElement) {
 			document.exitFullscreen();
 		}
-	})
-
-	function showMenu() {
-		menuHidden = !menuHidden;
-	}
+	});
 
 	function onFullScreenChange() {
-					if (document.fullscreenElement) {
-				fullScreen = true
-			} else {
-				fullScreen = false
-			}
-
+		if (document.fullscreenElement) {
+			fullScreen = true;
+		} else {
+			fullScreen = false;
+		}
 	}
 
+	function onMenuClose() {
+		showMenu = false;
+	}
 
 	function onKeyDown(event) {
 		switch (event.key) {
@@ -96,22 +98,21 @@
 		}
 	}
 
+	let time = $state(new Date());
+	let currentTime = $derived(
+		`${time.getHours().toString().padStart(2, '0')}:${time.getMinutes().toString().padStart(2, '0')}`
+	);
+	let currentDate = $derived(time.toDateString());
 
+	onMount(() => {
+		const interval = setInterval(() => {
+			time = new Date();
+		});
 
-	/**
-	 * Shuffles array in place.
-	 * @param {Array} a items An array containing the items.
-	 */
-	function shuffle(a) {
-		var j, x, i;
-		for (i = a.length - 1; i > 0; i--) {
-			j = Math.floor(Math.random() * (i + 1));
-			x = a[i];
-			a[i] = a[j];
-			a[j] = x;
-		}
-		return a;
-	}
+		return () => {
+			clearInterval(interval);
+		};
+	});
 </script>
 
 <svelte:head>
@@ -124,6 +125,7 @@
 	<meta property="og:image" content="/previewImage.webp" />
 	<meta name="twitter:card" content="summary_large_image" />
 	<script defer data-domain="just-rain.win" src="https://plausible.dzle.org/js/script.js"></script>
+	<script src="https://w.soundcloud.com/player/api.js" charset="utf-8"></script>
 </svelte:head>
 
 <svelte:document on:fullscreenchange={onFullScreenChange} />
@@ -139,10 +141,51 @@
 	bind:player
 />
 
-<div class="min-w-fit h-svh flex flex-col">
-	{#if menuHidden}
-		<Screensaver {showMenu} />
-	{:else}
-		<Menu {rainSrc} {showMenu} bind:currentAudioSrc bind:pause bind:volume bind:fullScreen />
+<div class="min-w-96 h-svh flex flex-col">
+	<div class="flex flex-col h-full">
+		<main class="flex-1">
+			<div class="flex justify-center pt-3 h-14">
+				{#if !showMenu}
+					<button
+						class="btn btn-circle btn-ghost z-10"
+						onclick={() => {
+							showMenu = true;
+						}}
+						transition:fly={{ y: 20 }}
+					>
+						<CircleChevronDown />
+					</button>
+				{/if}
+			</div>
+			<div class="flex justify-end px-10">
+				<div class="flex flex-col p-4 rounded-lg backdrop-blur-3xl text-white" transition:blur>
+					<div class="flex justify-end text-3xl bold">{currentTime}</div>
+					<div class="text-xl">{currentDate}</div>
+				</div>
+			</div>
+			<div class="flex justify-end pr-10 pt-3">
+				{#if enableSC}
+					<SCWidget bind:volume bind:pause />
+				{/if}
+			</div>
+		</main>
+		<footer class="text-center text-xs text-gray-500 pb-3" in:blur={{ delay: 1000 }} out:blur>
+			<span
+				>Dev by ✨ <a href="mailto:meshchaninov.n@gmail.com" class="link">Nikita Meshchaninov</a
+				></span
+			>
+		</footer>
+	</div>
+
+	{#if showMenu}
+		<Menu
+			{rainSrc}
+			{onMenuClose}
+			bind:currentAudioSrc
+			bind:pause
+			bind:volume
+			bind:fullScreen
+			bind:enableSC
+		/>
 	{/if}
 </div>
