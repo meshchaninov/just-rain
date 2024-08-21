@@ -24,7 +24,7 @@
 <div>
 	<div class="absolute z-10 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
 		<div class="hero">
-			<div class="hero-content flex-col ">
+			<div class="hero-content flex-col">
 				<div class="card max-w-sm shrink-0 bg-blur" transition:fly={{ y: -100 }}>
 					<div class="card-body rounded-lg w-96 lg:w-96 backdrop-blur-xl">
 						<div class="flex justify-end">
@@ -42,13 +42,19 @@
 												{#if pause}
 													<button
 														aria-label="Play"
+														title="Play"
 														class="w-60 inline-flex items-center justify-center py-3 pyx-6 font-dm rounded-lg shadow-lg shadow-cyan-500/50 bg-cyan-500 hover:bg-cyan-500 text-black"
 														onclick={() => setPause()}
 													>
 														<Play />
 													</button>
 												{:else}
-													<button aria-label="Pause" class="btn w-60" onclick={() => setPause()}>
+													<button
+														aria-label="Pause"
+														title="Pause"
+														class="btn w-60"
+														onclick={() => setPause()}
+													>
 														<Pause />
 													</button>
 												{/if}
@@ -62,6 +68,8 @@
 										<div class="flex justify-between w-full gap-10">
 											<span class="label-text">Volume</span>
 											<input
+												aria-label="Volume"
+												title="Volume"
 												type="range"
 												min="0"
 												max="1"
@@ -80,6 +88,7 @@
 											{#each rainSrc as _, i}
 												<button
 													class="btn btn-sm"
+													title={'Select audio ' + (i + 1)}
 													class:btn-active={currentAudioSrc === rainSrc[i]}
 													onclick={() => setCurrentAudioSrc(rainSrc[i])}>{i + 1}</button
 												>
@@ -93,6 +102,8 @@
 										<div class="flex justify-center">
 											<input
 												aria-labelledby="Full screen"
+												aria-label="Full screen"
+												title="Toggle full screen"
 												type="checkbox"
 												class="toggle"
 												bind:checked={fullScreen}
@@ -100,12 +111,14 @@
 										</div>
 									</label>
 								</div>
-																<div class="form-control">
+								<div class="form-control">
 									<label class="label">
 										<span class="label-text"><Music /></span>
 										<div class="flex justify-center">
 											<input
 												aria-labelledby="Music"
+												aria-label="Music"
+												title="Toggle Music widget"
 												type="checkbox"
 												class="toggle toggle-accent"
 												bind:checked={enableSC}
