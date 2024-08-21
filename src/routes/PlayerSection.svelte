@@ -3,15 +3,15 @@
 
     let { bgSrcVideo, bgSrcPreview, audioSrc, volume = $bindable(), pause = $bindable(), player = $bindable() } = $props();
 
+	// let audioCtx = null;
+	// let gainNode = null;
+
 	let autoPlayAudio = $state(false);
 
 	onMount(() => {
 		autoPlayAudio = true;
 	});
-	// let audioCtx = null;
-	// let gainNode = null;
 
-	// onMount(() => {
 	// 	audioCtx = new window.AudioContext();
 	// 	gainNode = audioCtx.createGain();
 	// 	const source = audioCtx.createMediaElementSource(player);
@@ -25,8 +25,8 @@
 
 
 
-
 </script>
+
 <section>
 	<div class="absolute w-full h-full object-cover -z-10">
 		<video

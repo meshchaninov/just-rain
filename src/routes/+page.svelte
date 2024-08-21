@@ -13,7 +13,7 @@
 
 	let player = $state(null);
 
-	let pause = $state(player?.paused || true);
+	let pause = $state(true);
 	let volume = $state(0.8);
 	let currentAudioSrc = $state(rainSrc[0]);
 	let currentBgSrc = $state('');
@@ -72,15 +72,30 @@
 
 	}
 
-	function toggleFullScreen() {
-		if (!document.fullscreenElement) {
-			document.documentElement.requestFullscreen();
-			fullScreen = true;
-		} else if (document.exitFullscreen) {
-			document.exitFullscreen();
-			fullScreen = false;
+
+	function onKeyDown(event) {
+		switch (event.key) {
+			case 'ArrowUp':
+				volume = Math.min(1, volume + 0.1);
+				break;
+			case 'ArrowDown':
+				volume = Math.max(0, volume - 0.1);
+				break;
+			case ' ':
+				pause = !pause;
+				break;
+			case 'Enter':
+				showMenu();
+				break;
+			case 'F11':
+				fullScreen = !fullScreen;
+				break;
+			case 'f':
+				fullScreen = !fullScreen;
+				break;
 		}
 	}
+
 
 
 	/**
@@ -112,6 +127,8 @@
 </svelte:head>
 
 <svelte:document on:fullscreenchange={onFullScreenChange} />
+
+<svelte:window on:keydown={onKeyDown} />
 
 <PlayerSection
 	bgSrcVideo={currentBgSrc.media}
