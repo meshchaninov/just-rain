@@ -3,6 +3,11 @@
 
     let { bgSrcVideo, bgSrcPreview, audioSrc, volume = $bindable(), pause = $bindable(), player = $bindable() } = $props();
 
+	let autoPlayAudio = $state(false);
+
+	onMount(() => {
+		autoPlayAudio = true;
+	});
 	// let audioCtx = null;
 	// let gainNode = null;
 
@@ -19,6 +24,8 @@
 	// });
 
 
+
+
 </script>
 <section>
 	<div class="absolute w-full h-full object-cover -z-10">
@@ -33,5 +40,5 @@
 			poster={bgSrcPreview}
 		></video>	
 	</div>
-	<audio bind:this={player} bind:paused={pause} bind:volume={volume} loop autoplay src={audioSrc} ></audio>
+	<audio bind:this={player} bind:paused={pause} bind:volume={volume} loop autoplay={autoPlayAudio} src={audioSrc} ></audio>
 </section>

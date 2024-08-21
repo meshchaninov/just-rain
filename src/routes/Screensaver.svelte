@@ -27,7 +27,7 @@
 	<main class="flex-1">
 		<div class="flex justify-center pt-3">
 			<button
-				class="btn btn-circle btn-ghost text-white"
+				class="btn btn-circle btn-ghost"
 				onclick={() => showMenu()}
 				transition:fly={{ y: 20 }}
 			>

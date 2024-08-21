@@ -16,7 +16,7 @@
 	let pause = $state(player?.paused || true);
 	let volume = $state(0.8);
 	let currentAudioSrc = $state(rainSrc[0]);
-	let currentBgSrc = $state(shuffleBgSrc[0]);
+	let currentBgSrc = $state('');
 	let menuHidden = $state(false);
 	let bgTimeLeft = $state(bgTimeChange);
 	let currentBgIndex = $state(0);
@@ -30,13 +30,6 @@
 		}
 	});
 
-	$effect(() => {
-		if (fullScreen) {
-			document.documentElement.requestFullscreen();
-		} else if (!fullScreen) {
-			document.exitFullscreen();
-		}
-	})
 
 	onMount(() => {
 		const interval = setInterval(() => {
@@ -50,12 +43,21 @@
 
 		pause = player?.paused || true;
 		console.log('Shuffled background sources', shuffleBgSrc);
+		currentBgSrc = shuffleBgSrc[currentBgIndex];
 
 		return () => {
 			player.pause();
 			clearInterval(interval);
 		};
 	});
+
+	$effect(() => {
+		if (fullScreen) {
+			document.documentElement.requestFullscreen();
+		} else if (!fullScreen && document.fullscreenElement) {
+			document.exitFullscreen();
+		}
+	})
 
 	function showMenu() {
 		menuHidden = !menuHidden;
