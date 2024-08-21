@@ -125,7 +125,7 @@
 	<meta property="og:image" content="/previewImage.webp" />
 	<meta name="twitter:card" content="summary_large_image" />
 	<script defer data-domain="just-rain.win" src="https://plausible.dzle.org/js/script.js"></script>
-	<script src="https://w.soundcloud.com/player/api.js" charset="utf-8"></script>
+	<script defer src="https://w.soundcloud.com/player/api.js" charset="utf-8"></script>
 </svelte:head>
 
 <svelte:document on:fullscreenchange={onFullScreenChange} />
