@@ -41,13 +41,14 @@
 											<div class="">
 												{#if pause}
 													<button
+														aria-label="Play"
 														class="w-60 inline-flex items-center justify-center py-3 pyx-6 font-dm rounded-lg shadow-lg shadow-cyan-500/50 bg-cyan-500 hover:bg-cyan-500 text-black"
 														onclick={() => setPause()}
 													>
 														<Play />
 													</button>
 												{:else}
-													<button class="btn w-60" onclick={() => setPause()}>
+													<button aria-label="Pause" class="btn w-60" onclick={() => setPause()}>
 														<Pause />
 													</button>
 												{/if}
@@ -91,6 +92,7 @@
 										<span class="label-text">Full screen</span>
 										<div class="flex justify-center">
 											<input
+												aria-labelledby="Full screen"
 												type="checkbox"
 												class="toggle"
 												bind:checked={fullScreen}
@@ -103,6 +105,7 @@
 										<span class="label-text"><Music /></span>
 										<div class="flex justify-center">
 											<input
+												aria-labelledby="Music"
 												type="checkbox"
 												class="toggle toggle-accent"
 												bind:checked={enableSC}
