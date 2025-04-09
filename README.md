@@ -1,4 +1,4 @@
-# Just-Rain 🌧️
+# [Just-Rain](https://rain.dzle.org) 🌧️
 
 ![preview](.github/preview.png)
 
