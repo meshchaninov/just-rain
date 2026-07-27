@@ -26,6 +26,7 @@
 
 	onMount(() => {
 		autoPlayAudio = true;
+		configureBackgroundPlayback();
 
 		if ('mediaSession' in navigator) {
 			navigator.mediaSession.metadata = new MediaMetadata({
@@ -91,6 +92,8 @@
 	});
 
 	async function initializeAudioGraph() {
+		configureBackgroundPlayback();
+
 		if (audioContext) {
 			if (audioContext.state === 'suspended') {
 				await audioContext.resume();
@@ -115,6 +118,15 @@
 			await audioContext.resume();
 		}
 	}
+
+	function configureBackgroundPlayback() {
+		const audioSession =
+			/** @type {Navigator & { audioSession?: { type: string } }} */ (navigator).audioSession;
+
+		if (audioSession) {
+			audioSession.type = 'playback';
+		}
+	}
 </script>
 
 <section>
@@ -130,5 +142,12 @@
 			poster={bgSrcPreview}
 		></video>
 	</div>
-	<audio bind:this={player} bind:paused={pause} loop autoplay={autoPlayAudio} src={audioSrc}></audio>
+	<audio
+		bind:this={player}
+		bind:paused={pause}
+		loop
+		preload="auto"
+		autoplay={autoPlayAudio}
+		src={audioSrc}
+	></audio>
 </section>
