@@ -243,9 +243,7 @@
 				</div>
 			</div>
 			<div class="flex justify-end pr-10 pt-3">
-				{#if enableSC}
-					<SCWidget bind:volume bind:pause />
-				{/if}
+				<SCWidget active={enableSC} bind:volume bind:pause />
 			</div>
 		</main>
 		<footer class="text-center text-xs text-gray-500 pb-3" in:blur={{ delay: 1000 }} out:blur>

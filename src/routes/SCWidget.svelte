@@ -4,11 +4,11 @@
 	import { onMount } from 'svelte';
 	import { blur } from 'svelte/transition';
 
-	let { pause = $bindable(true), volume = $bindable(0.8) } = $props();
+	let { active = true, pause = $bindable(true), volume = $bindable(0.8) } = $props();
 
 	let SCIframe;
 	let widget;
-	let showWidget = $state(false);
+	let showWidget = $state(true);
 	let currentMusicIndx = $state(0);
 	let playlistLength = 0;
 	let widgetReady = $state(false);
@@ -51,7 +51,7 @@
 				widgetReady = true;
 				changeVolume();
 
-				if (pause) {
+				if (!active || pause) {
 					widget.pause();
 				} else {
 					widget.play();
@@ -73,10 +73,17 @@
 	});
 
 	$effect(() => {
+		if (!active) return;
+
+		showWidget = true;
+		pause = false;
+	});
+
+	$effect(() => {
 		if (!widgetReady) return;
 
 		changeVolume();
-		if (pause) {
+		if (!active || pause) {
 			widget.pause();
 		} else {
 			widget.play();
@@ -107,7 +114,7 @@
 
 <svelte:document />
 
-<div class="flex flex-col justify-end gap-2">
+<div class="flex flex-col justify-end gap-2" class:hidden={!active}>
 	{#if showWidget}
 		<div class="flex justify-end">
 			<CloseButton {onClose} />
