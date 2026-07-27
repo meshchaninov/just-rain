@@ -5,11 +5,14 @@ const target = document.getElementById('app');
 
 if (target) {
 	const audioSources = Media.audio;
-	const videoSources = Media.video;
+	const videoSources = Media.tvVideo || Media.video;
+	const mediaBase =
+		typeof window.JUST_RAIN_MEDIA_BASE === 'string' ? window.JUST_RAIN_MEDIA_BASE : '';
 	let currentVideoIndex = Math.floor(Math.random() * videoSources.length);
 	let currentAudioIndex = 0;
 	let menuOpen = true;
 	let focusIndex = 0;
+	let videoChangeToken = 0;
 
 	target.innerHTML = `
 		<style>
@@ -57,9 +60,12 @@ if (target) {
 					<span>Menu</span>
 					<button id="tv-close" class="tv-legacy__button" data-tv-focus>Close</button>
 				</div>
-				<div class="tv-legacy__hint">Arrows — navigate · Enter — select · Back — close</div>
+				<div class="tv-legacy__hint">
+					Arrows — navigate · Enter — select · Back — close<br>
+					After closing: Left/Right — rain scene · Up/Down — volume
+				</div>
 			</div>
-			<div class="tv-legacy__footer">Just Rain · Samsung TV browser mode</div>
+			<div class="tv-legacy__footer">Just Rain · Samsung TV</div>
 		</div>`;
 
 	const video = document.getElementById('tv-video');
@@ -71,19 +77,61 @@ if (target) {
 	const closeButton = document.getElementById('tv-close');
 	const audioButtonsContainer = document.getElementById('tv-audio-buttons');
 
+	function resolveMediaPath(path) {
+		return mediaBase ? mediaBase + path.replace(/^\/+/, '') : path;
+	}
+
 	function setVideo(index) {
 		const source = videoSources[index];
-		video.poster = source.preview;
-		video.src = source.media;
+		const shouldRestoreAudio = !audio.paused;
+		const savedAudioTime = audio.currentTime || 0;
+		const changeToken = ++videoChangeToken;
+		let audioRestored = false;
+
+		function restoreAudio() {
+			if (audioRestored || !shouldRestoreAudio || changeToken !== videoChangeToken) return;
+			audioRestored = true;
+			audio.pause();
+
+			try {
+				audio.currentTime = savedAudioTime;
+			} catch (error) {
+				// Some older Tizen builds reject seeking until the streamed MP3 is ready.
+			}
+
+			const audioPlayAttempt = audio.play();
+			if (audioPlayAttempt && audioPlayAttempt.catch) {
+				audioPlayAttempt.catch(function () {
+					playButton.textContent = 'Play';
+				});
+			}
+		}
+
+		function handleVideoPlaying() {
+			video.removeEventListener('playing', handleVideoPlaying);
+			setTimeout(restoreAudio, 250);
+		}
+
+		video.addEventListener('playing', handleVideoPlaying);
+		video.poster = resolveMediaPath(source.preview);
+		video.src = resolveMediaPath(source.media);
 		video.load();
 		const playAttempt = video.play();
 		if (playAttempt && playAttempt.catch) playAttempt.catch(function () {});
+
+		// Fallback for firmware versions that do not emit `playing` after a source change.
+		setTimeout(restoreAudio, 1500);
+	}
+
+	function changeVideo(offset) {
+		currentVideoIndex = (currentVideoIndex + offset + videoSources.length) % videoSources.length;
+		setVideo(currentVideoIndex);
 	}
 
 	function setAudio(index) {
 		const wasPlaying = !audio.paused;
 		currentAudioIndex = index;
-		audio.src = audioSources[index];
+		audio.src = resolveMediaPath(audioSources[index]);
 		audio.load();
 		updateAudioButtons();
 
@@ -150,6 +198,15 @@ if (target) {
 		openButton.focus();
 	}
 
+	function exitTizenApplication() {
+		if (window.tizen && window.tizen.application) {
+			window.tizen.application.getCurrentApplication().exit();
+			return true;
+		}
+
+		return false;
+	}
+
 	function pad(value) {
 		return value < 10 ? '0' + value : String(value);
 	}
@@ -190,13 +247,19 @@ if (target) {
 		}
 
 		if (!menuOpen) {
-			if (keyCode === 13) {
+			if (keyCode === 10009) {
+				event.preventDefault();
+				exitTizenApplication();
+			} else if (keyCode === 13) {
 				event.preventDefault();
 				showMenu();
 			} else if (keyCode === 38 || keyCode === 40) {
 				event.preventDefault();
 				audio.volume = Math.max(0, Math.min(1, audio.volume + (keyCode === 38 ? 0.1 : -0.1)));
 				volumeInput.value = String(audio.volume);
+			} else if (keyCode === 37 || keyCode === 39) {
+				event.preventDefault();
+				changeVideo(keyCode === 37 ? -1 : 1);
 			}
 			return;
 		}
@@ -229,8 +292,7 @@ if (target) {
 	setInterval(updateClock, 1000);
 	setInterval(
 		function () {
-			currentVideoIndex = (currentVideoIndex + 1) % videoSources.length;
-			setVideo(currentVideoIndex);
+			changeVideo(1);
 		},
 		3 * 60 * 1000
 	);

@@ -6,6 +6,8 @@
 		"dev": "vite dev",
 		"build": "vite build && npm run build:legacy",
 		"build:legacy": "vite build --config vite.legacy.config.js && node scripts/transpile-legacy.js",
+		"build:tizen": "npm run build:legacy && node scripts/build-tizen.js",
+		"build:tizen:dev": "npm run build:legacy && node scripts/build-tizen.js --dev",
 		"preview": "vite preview",
 		"check": "svelte-kit sync && svelte-check --tsconfig ./jsconfig.json",
 		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./jsconfig.json --watch",

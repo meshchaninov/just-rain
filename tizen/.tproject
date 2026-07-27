@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<tproject xmlns="http://tizen.org/ns/tproject">
+	<platform>
+		<name>tv-samsung</name>
+		<version>3.0</version>
+	</platform>
+</tproject>
