@@ -153,19 +153,18 @@
 	}
 </script>
 
-<section>
-	<div class="absolute w-full h-full object-cover -z-10">
-		<video
-			class="absolute w-full h-full object-cover -z-10"
-			muted
-			autoplay
-			loop
-			playsinline
-			disablepictureinpicture
-			src={bgSrcVideo}
-			poster={bgSrcPreview}
-		></video>
-	</div>
+<section class="fixed inset-0 z-0 overflow-hidden bg-black">
+	<video
+		class="h-full w-full object-cover"
+		muted
+		autoplay
+		loop
+		playsinline
+		preload="auto"
+		disablepictureinpicture
+		src={bgSrcVideo}
+		poster={bgSrcPreview}
+	></video>
 	<audio
 		bind:this={player}
 		bind:paused={pause}

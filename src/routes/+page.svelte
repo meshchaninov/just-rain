@@ -220,7 +220,7 @@
 	bind:player
 />
 
-<div class="tv-app-shell flex flex-col">
+<div class="tv-app-shell relative z-10 flex flex-col">
 	<div class="flex flex-col h-full">
 		<main class="flex-1">
 			<div class="flex justify-center pt-3 h-14">
