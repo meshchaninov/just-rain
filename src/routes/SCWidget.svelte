@@ -3,46 +3,68 @@
 	import { Music } from 'lucide-svelte';
 	import { onMount } from 'svelte';
 	import { blur } from 'svelte/transition';
-	import { shuffle } from '$lib/utils';
 
 	let { pause = $bindable(true), volume = $bindable(0.8) } = $props();
-	
 
 	let SCIframe;
 	let widget;
 	let showWidget = $state(false);
-	const musicIndxList = createIndxList(399); // TODO: Get the length of the playlist
 	let currentMusicIndx = $state(0);
+	let playlistLength = 0;
+	let widgetReady = $state(false);
 	let loading = $state(true);
 
 	onMount(() => {
 		widget = window.SC.Widget(SCIframe);
-		currentMusicIndx = 0;
-		console.log('Current music index', currentMusicIndx);
 
-		widget.bind(window.SC.Widget.Events.READY, function () {
-			widget.unbind(SC.Widget.Events.FINISH);
-            console.log('SC Widget is ready');
-			widget.getSounds(function (sounds) {
-				console.log('Sounds', sounds);
-			});
-			widget.bind(window.SC.Widget.Events.FINISH, function () {
-				console.log('Finished playing');
-				playNexSong(widget);
-			});
-			if (pause) {
-				widget.pause();
-			} else {
+		function playNextSong() {
+			if (playlistLength === 0) return;
+
+			currentMusicIndx = (currentMusicIndx + 1) % playlistLength;
+			widget.skip(currentMusicIndx);
+			if (!pause) {
 				widget.play();
 			}
-			playNexSong(widget);
-			changeVolume();
-			loading = false;
-		});
+			console.log('Playing next song', currentMusicIndx);
+		}
 
+		function onReady() {
+			widget.unbind(window.SC.Widget.Events.FINISH);
+			console.log('SC Widget is ready');
+			widget.getSounds(function (sounds) {
+				playlistLength = sounds.length;
+
+				if (playlistLength > 0) {
+					currentMusicIndx = Math.floor(Math.random() * playlistLength);
+					widget.skip(currentMusicIndx);
+					console.log('Playing first random song', currentMusicIndx);
+				}
+
+				widget.bind(window.SC.Widget.Events.FINISH, playNextSong);
+				widgetReady = true;
+				changeVolume();
+
+				if (pause) {
+					widget.pause();
+				} else {
+					widget.play();
+				}
+
+				loading = false;
+			});
+		}
+
+		widget.bind(window.SC.Widget.Events.READY, onReady);
+
+		return () => {
+			widget.unbind(window.SC.Widget.Events.READY);
+			widget.unbind(window.SC.Widget.Events.FINISH);
+		};
 	});
 
 	$effect(() => {
+		if (!widgetReady) return;
+
 		changeVolume();
 		if (pause) {
 			widget.pause();
@@ -60,18 +82,8 @@
 	}
 
 	function changeVolume() {
+		if (!widgetReady) return;
 		widget.setVolume(volume * 100 * 0.8);
-	}
-
-	function createIndxList(length) {
-		return [...shuffle(Array.from(Array(length + 1).keys()))];
-	}
-
-	function playNexSong(widget) {
-		const nextSoungIndx = musicIndxList[Math.floor(Math.random() * musicIndxList.length)];
-		widget.skip(nextSoungIndx);
-		widget.play();
-		console.log('Playing next song', nextSoungIndx);
 	}
 </script>
 
