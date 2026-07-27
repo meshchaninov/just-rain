@@ -29,19 +29,6 @@
 		configureBackgroundPlayback();
 
 		if ('mediaSession' in navigator) {
-			navigator.mediaSession.metadata = new MediaMetadata({
-				title: 'Rain ambience',
-				artist: 'Just Rain',
-				album: 'Just Rain',
-				artwork: [
-					{
-						src: new URL('/previewImage.webp', window.location.origin).href,
-						sizes: '3024x1890',
-						type: 'image/webp'
-					}
-				]
-			});
-
 			navigator.mediaSession.setActionHandler('play', () => {
 				pause = false;
 				player?.play();
@@ -86,6 +73,23 @@
 	});
 
 	$effect(() => {
+		if ('mediaSession' in navigator && 'MediaMetadata' in window) {
+			navigator.mediaSession.metadata = new MediaMetadata({
+				title: 'Rain ambience',
+				artist: 'Just Rain',
+				album: 'Just Rain',
+				artwork: [
+					{
+						src: getPlayerArtwork(bgSrcVideo),
+						sizes: '1200x1200',
+						type: 'image/jpeg'
+					}
+				]
+			});
+		}
+	});
+
+	$effect(() => {
 		if ('mediaSession' in navigator) {
 			navigator.mediaSession.playbackState = pause ? 'paused' : 'playing';
 		}
@@ -126,6 +130,18 @@
 		if (audioSession) {
 			audioSession.type = 'playback';
 		}
+	}
+
+	/**
+	 * @param {string} videoSrc
+	 * @returns {string}
+	 */
+	function getPlayerArtwork(videoSrc) {
+		const filename =
+			typeof videoSrc === 'string' ? videoSrc.match(/(?:^|\/)(rain\d+)\.[^/.]+$/)?.[1] : null;
+		const artworkPath = `/video/player/${filename || 'rain1'}.jpg`;
+
+		return new URL(artworkPath, window.location.origin).href;
 	}
 </script>
 

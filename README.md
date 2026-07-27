@@ -22,6 +22,14 @@ Welcome to **Just-Rain**, a calming and immersive web experience that brings the
 5. **Save as PWA**: Install Just-Rain as a PWA on your device for offline access.
 6. **Relax**: Sit back, relax, and let the rain wash away your stress.
 
+### Samsung TV browser
+
+The production build includes a legacy bundle for 2017 Samsung TVs running
+Tizen 3.0 / Chromium 47, including UE43M5503. Open the deployed site in the TV
+browser and use the arrow keys to navigate, Enter to select, and Back to close
+the menu. Audio playback still requires an initial user action because of
+browser autoplay restrictions.
+
 ## Tech Stack 💻
 
 - **Frontend**: SvelteKit
@@ -56,4 +64,4 @@ Contributions are welcome! If you'd like to improve Just-Rain, feel free to open
 ---
 
 Enjoy the rain! 🌧️  
-*"Sometimes, you just need to sit back, listen to the rain, and let nature do the talking."*
+_"Sometimes, you just need to sit back, listen to the rain, and let nature do the talking."_

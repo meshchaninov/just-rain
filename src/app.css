@@ -1,3 +1,40 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+html,
+body {
+	width: 100%;
+	height: 100%;
+	margin: 0;
+	overflow: hidden;
+	background: #050709;
+}
+
+/* Chromium 47 ignores svh, so 100vh must come first as the TV-safe fallback. */
+.tv-app-shell {
+	width: 100%;
+	min-width: 0;
+	height: 100vh;
+	height: 100svh;
+}
+
+/* Old Samsung browsers need a readable surface when backdrop blur is unavailable. */
+.backdrop-blur-xl,
+.backdrop-blur-3xl {
+	background-color: rgba(15, 23, 42, 0.88);
+}
+
+button:focus,
+input:focus,
+a:focus {
+	outline: 4px solid #22d3ee;
+	outline-offset: 4px;
+}
+
+@supports ((-webkit-backdrop-filter: blur(1px)) or (backdrop-filter: blur(1px))) {
+	.backdrop-blur-xl,
+	.backdrop-blur-3xl {
+		background-color: rgba(15, 23, 42, 0.35);
+	}
+}

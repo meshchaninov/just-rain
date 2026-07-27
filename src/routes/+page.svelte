@@ -1,5 +1,5 @@
 <script>
-	import { onMount } from 'svelte';
+	import { onMount, tick } from 'svelte';
 	import Media from '$lib/media.json';
 	import Menu from './Menu.svelte';
 	import PlayerSection from './PlayerSection.svelte';
@@ -14,23 +14,33 @@
 
 	let shuffleBgSrc = $derived(shuffle(backgroundSrc));
 
+	/** @type {HTMLAudioElement | null} */
 	let player = $state(null);
 
 	let pause = $state(true);
 	let volume = $state(0.8);
 	let currentAudioSrc = $state(rainSrc[0]);
-	let currentBgSrc = $state('');
+	let currentBgSrc = $state(backgroundSrc[0]);
 	let showMenu = $state(true);
 	let bgTimeLeft = $state(bgTimeChange);
 	let currentBgIndex = $state(0);
 	let fullScreen = $state(false);
+	let fullScreenSupported = $state(false);
 	let enableSC = $state(false);
+	let menuFocusIndex = 1;
 
 	$effect(() => {
+		if (!player) return;
+
 		if (pause) {
 			player.pause();
 		} else {
-			player.play();
+			const playAttempt = player.play();
+			if (playAttempt) {
+				playAttempt.catch(() => {
+					pause = true;
+				});
+			}
 		}
 	});
 
@@ -45,21 +55,29 @@
 			}
 		}, 1000);
 
-		pause = player?.paused || true;
+		pause = player ? player.paused : true;
+		fullScreenSupported = Boolean(
+			document.fullscreenEnabled && document.documentElement.requestFullscreen
+		);
 		console.log('Shuffled background sources', shuffleBgSrc);
 		currentBgSrc = shuffleBgSrc[currentBgIndex];
+		tick().then(() => focusMenuItem(menuFocusIndex));
 
 		return () => {
-			player.pause();
+			if (player) player.pause();
 			clearInterval(interval);
 		};
 	});
 
 	$effect(() => {
-		if (fullScreen) {
-			document.documentElement.requestFullscreen();
+		if (!fullScreenSupported) return;
+
+		if (fullScreen && !document.fullscreenElement) {
+			const request = document.documentElement.requestFullscreen();
+			if (request) request.catch(() => (fullScreen = false));
 		} else if (!fullScreen && document.fullscreenElement) {
-			document.exitFullscreen();
+			const exit = document.exitFullscreen();
+			if (exit) exit.catch(() => {});
 		}
 	});
 
@@ -75,25 +93,105 @@
 		showMenu = false;
 	}
 
+	async function openMenu() {
+		showMenu = true;
+		menuFocusIndex = 1;
+		await tick();
+		focusMenuItem(menuFocusIndex);
+	}
+
+	function getMenuItems() {
+		return /** @type {HTMLElement[]} */ (
+			Array.from(document.querySelectorAll('[data-tv-focus]:not([disabled])'))
+		);
+	}
+
+	/** @param {number} index */
+	function focusMenuItem(index) {
+		const items = getMenuItems();
+		if (items.length === 0) return;
+
+		menuFocusIndex = Math.max(0, Math.min(index, items.length - 1));
+		items[menuFocusIndex].focus();
+	}
+
+	/** @param {number} offset */
+	function moveMenuFocus(offset) {
+		const items = getMenuItems();
+		const activeIndex = items.indexOf(/** @type {HTMLElement} */ (document.activeElement));
+		const startIndex = activeIndex >= 0 ? activeIndex : menuFocusIndex;
+		focusMenuItem(startIndex + offset);
+	}
+
+	/** @param {number} offset */
+	function adjustFocusedRange(offset) {
+		const activeElement = document.activeElement;
+		if (!(activeElement instanceof HTMLInputElement) || activeElement.type !== 'range')
+			return false;
+
+		volume = Math.max(0, Math.min(1, Number(volume) + offset));
+		return true;
+	}
+
+	/** @param {KeyboardEvent} event */
 	function onKeyDown(event) {
+		if (showMenu) {
+			if (event.keyCode === 27 || event.keyCode === 10009) {
+				event.preventDefault();
+				onMenuClose();
+				return;
+			}
+
+			switch (event.key) {
+				case 'ArrowUp':
+					event.preventDefault();
+					moveMenuFocus(-1);
+					return;
+				case 'ArrowDown':
+					event.preventDefault();
+					moveMenuFocus(1);
+					return;
+				case 'ArrowLeft':
+					event.preventDefault();
+					if (!adjustFocusedRange(-0.05)) moveMenuFocus(-1);
+					return;
+				case 'ArrowRight':
+					event.preventDefault();
+					if (!adjustFocusedRange(0.05)) moveMenuFocus(1);
+					return;
+				case 'Escape':
+				case 'Backspace':
+				case 'GoBack':
+					event.preventDefault();
+					onMenuClose();
+					return;
+			}
+		}
+
 		switch (event.key) {
 			case 'ArrowUp':
+				event.preventDefault();
 				volume = Math.min(1, volume + 0.1);
 				break;
 			case 'ArrowDown':
+				event.preventDefault();
 				volume = Math.max(0, volume - 0.1);
 				break;
 			case ' ':
+				event.preventDefault();
 				pause = !pause;
 				break;
 			case 'Enter':
-				showMenu();
+				if (!showMenu) {
+					event.preventDefault();
+					openMenu();
+				}
 				break;
 			case 'F11':
-				fullScreen = !fullScreen;
+				if (fullScreenSupported) fullScreen = !fullScreen;
 				break;
 			case 'f':
-				fullScreen = !fullScreen;
+				if (fullScreenSupported) fullScreen = !fullScreen;
 				break;
 		}
 	}
@@ -103,21 +201,10 @@
 		`${time.getHours().toString().padStart(2, '0')}:${time.getMinutes().toString().padStart(2, '0')}`
 	);
 	let currentDate = $derived(time.toDateString());
-
-	onMount(() => {
-		const interval = setInterval(() => {
-			time = new Date();
-		});
-
-		return () => {
-			clearInterval(interval);
-		};
-	});
 </script>
 
 <svelte:head>
 	<title>Just Rain</title>
-	
 </svelte:head>
 
 <svelte:document on:fullscreenchange={onFullScreenChange} />
@@ -133,7 +220,7 @@
 	bind:player
 />
 
-<div class="min-w-96 h-svh flex flex-col">
+<div class="tv-app-shell flex flex-col">
 	<div class="flex flex-col h-full">
 		<main class="flex-1">
 			<div class="flex justify-center pt-3 h-14">
@@ -141,7 +228,7 @@
 					<button
 						class="btn btn-circle btn-ghost z-10"
 						onclick={() => {
-							showMenu = true;
+							openMenu();
 						}}
 						transition:fly={{ y: 20 }}
 					>
@@ -177,6 +264,7 @@
 			bind:pause
 			bind:volume
 			bind:fullScreen
+			{fullScreenSupported}
 			bind:enableSC
 		/>
 	{/if}

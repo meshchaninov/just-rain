@@ -9,6 +9,7 @@
 		pause = $bindable(),
 		volume = $bindable(),
 		fullScreen = $bindable(),
+		fullScreenSupported = false,
 		enableSC = $bindable()
 	} = $props();
 
@@ -28,7 +29,11 @@
 				<div class="card max-w-sm shrink-0 bg-blur" transition:fly={{ y: -100 }}>
 					<div class="card-body rounded-lg w-96 lg:w-96 backdrop-blur-xl">
 						<div class="flex justify-end">
-							<button class="btn btn-xs btn-ghost btn-circle" onclick={() => onMenuClose()}>
+							<button
+								data-tv-focus
+								class="btn btn-xs btn-ghost btn-circle"
+								onclick={() => onMenuClose()}
+							>
 								<X />
 							</button>
 						</div>
@@ -44,6 +49,7 @@
 														aria-label="Play"
 														title="Play"
 														class="w-60 inline-flex items-center justify-center py-3 pyx-6 font-dm rounded-lg shadow-lg shadow-cyan-500/50 bg-cyan-500 hover:bg-cyan-500 text-black"
+														data-tv-focus
 														onclick={() => setPause()}
 													>
 														<Play />
@@ -53,6 +59,7 @@
 														aria-label="Pause"
 														title="Pause"
 														class="btn w-60"
+														data-tv-focus
 														onclick={() => setPause()}
 													>
 														<Pause />
@@ -75,6 +82,7 @@
 												max="1"
 												step="0.01"
 												class="range range-xs"
+												data-tv-focus
 												bind:value={volume}
 											/>
 										</div>
@@ -88,6 +96,7 @@
 											{#each rainSrc as _, i}
 												<button
 													class="btn btn-sm"
+													data-tv-focus
 													title={'Select audio ' + (i + 1)}
 													class:btn-active={currentAudioSrc === rainSrc[i]}
 													onclick={() => setCurrentAudioSrc(rainSrc[i])}>{i + 1}</button
@@ -96,21 +105,24 @@
 										</div>
 									</label>
 								</div>
-								<div class="form-control">
-									<label class="label">
-										<span class="label-text">Full screen</span>
-										<div class="flex justify-center">
-											<input
-												aria-labelledby="Full screen"
-												aria-label="Full screen"
-												title="Toggle full screen"
-												type="checkbox"
-												class="toggle"
-												bind:checked={fullScreen}
-											/>
-										</div>
-									</label>
-								</div>
+								{#if fullScreenSupported}
+									<div class="form-control">
+										<label class="label">
+											<span class="label-text">Full screen</span>
+											<div class="flex justify-center">
+												<input
+													aria-labelledby="Full screen"
+													aria-label="Full screen"
+													title="Toggle full screen"
+													type="checkbox"
+													class="toggle"
+													data-tv-focus
+													bind:checked={fullScreen}
+												/>
+											</div>
+										</label>
+									</div>
+								{/if}
 								<div class="form-control">
 									<label class="label">
 										<span class="label-text"><Music /></span>
@@ -121,6 +133,7 @@
 												title="Toggle Music widget"
 												type="checkbox"
 												class="toggle toggle-accent"
+												data-tv-focus
 												bind:checked={enableSC}
 											/>
 										</div>
