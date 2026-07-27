@@ -20,9 +20,9 @@
 
 	let autoPlayAudio = $state(false);
 	/** @type {AudioContext | undefined} */
-	let audioContext;
+	let audioContext = $state();
 	/** @type {GainNode | undefined} */
-	let gainNode;
+	let gainNode = $state();
 
 	onMount(() => {
 		autoPlayAudio = true;
@@ -62,14 +62,7 @@
 	});
 
 	$effect(() => {
-		const normalizedVolume = Math.min(1, Math.max(0, Number(volume)));
-
-		if (gainNode && audioContext) {
-			gainNode.gain.setValueAtTime(normalizedVolume, audioContext.currentTime);
-		} else if (player) {
-			// Fallback for browsers without Web Audio support.
-			player.volume = normalizedVolume;
-		}
+		applyVolume(volume);
 	});
 
 	$effect(() => {
@@ -114,9 +107,9 @@
 		audioContext = new AudioContextConstructor();
 		const source = audioContext.createMediaElementSource(player);
 		gainNode = audioContext.createGain();
-		gainNode.gain.value = Math.min(1, Math.max(0, Number(volume)));
 		source.connect(gainNode);
 		gainNode.connect(audioContext.destination);
+		applyVolume(volume);
 
 		if (audioContext.state === 'suspended') {
 			await audioContext.resume();
@@ -129,6 +122,21 @@
 
 		if (audioSession) {
 			audioSession.type = 'playback';
+		}
+	}
+
+	/** @param {number} nextVolume */
+	function applyVolume(nextVolume) {
+		const normalizedVolume = Math.min(1, Math.max(0, Number(nextVolume)));
+
+		if (gainNode && audioContext && player) {
+			// Keep the media element neutral so volume is applied exactly once by Web Audio.
+			player.volume = 1;
+			gainNode.gain.cancelScheduledValues(audioContext.currentTime);
+			gainNode.gain.setValueAtTime(normalizedVolume, audioContext.currentTime);
+		} else if (player) {
+			// Fallback for browsers without Web Audio support.
+			player.volume = normalizedVolume;
 		}
 	}
 
