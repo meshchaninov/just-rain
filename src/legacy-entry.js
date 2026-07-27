@@ -1,14 +1,13 @@
 // @ts-nocheck -- intentionally ES5-compatible DOM fallback validated by its dedicated build.
-import Media from '$lib/media.json';
 
 const target = document.getElementById('app');
 
 if (target) {
-	const audioSources = Media.audio;
-	const videoSources = Media.tvVideo || Media.video;
+	let audioSources = [];
+	let videoSources = [];
 	const mediaBase =
 		typeof window.JUST_RAIN_MEDIA_BASE === 'string' ? window.JUST_RAIN_MEDIA_BASE : '';
-	let currentVideoIndex = Math.floor(Math.random() * videoSources.length);
+	let currentVideoIndex = 0;
 	let currentAudioIndex = 0;
 	let menuOpen = true;
 	let focusIndex = 0;
@@ -46,7 +45,7 @@ if (target) {
 			<div id="tv-menu" class="tv-legacy__menu">
 				<div class="tv-legacy__row">
 					<span>Playing</span>
-					<button id="tv-play" class="tv-legacy__button tv-legacy__button--primary" data-tv-focus>Play</button>
+					<button id="tv-play" class="tv-legacy__button tv-legacy__button--primary" data-tv-focus>Loading…</button>
 				</div>
 				<div class="tv-legacy__row">
 					<label for="tv-volume">Volume</label>
@@ -65,7 +64,7 @@ if (target) {
 					After closing: Left/Right — rain scene · Up/Down — volume
 				</div>
 			</div>
-			<div class="tv-legacy__footer">Just Rain · Samsung TV</div>
+			<div id="tv-footer" class="tv-legacy__footer">Just Rain · Samsung TV</div>
 		</div>`;
 
 	const video = document.getElementById('tv-video');
@@ -76,6 +75,7 @@ if (target) {
 	const openButton = document.getElementById('tv-open');
 	const closeButton = document.getElementById('tv-close');
 	const audioButtonsContainer = document.getElementById('tv-audio-buttons');
+	const footer = document.getElementById('tv-footer');
 
 	function resolveMediaPath(path) {
 		return mediaBase ? mediaBase + path.replace(/^\/+/, '') : path;
@@ -83,6 +83,7 @@ if (target) {
 
 	function setVideo(index) {
 		const source = videoSources[index];
+		if (!source) return;
 		const shouldRestoreAudio = !audio.paused;
 		const savedAudioTime = audio.currentTime || 0;
 		const changeToken = ++videoChangeToken;
@@ -113,7 +114,11 @@ if (target) {
 		}
 
 		video.addEventListener('playing', handleVideoPlaying);
-		video.poster = resolveMediaPath(source.preview);
+		if (source.preview) {
+			video.poster = resolveMediaPath(source.preview);
+		} else {
+			video.removeAttribute('poster');
+		}
 		video.src = resolveMediaPath(source.media);
 		video.load();
 		const playAttempt = video.play();
@@ -124,11 +129,13 @@ if (target) {
 	}
 
 	function changeVideo(offset) {
+		if (!videoSources.length) return;
 		currentVideoIndex = (currentVideoIndex + offset + videoSources.length) % videoSources.length;
 		setVideo(currentVideoIndex);
 	}
 
 	function setAudio(index) {
+		if (!audioSources[index]) return;
 		const wasPlaying = !audio.paused;
 		currentAudioIndex = index;
 		audio.src = resolveMediaPath(audioSources[index]);
@@ -150,6 +157,8 @@ if (target) {
 	}
 
 	function togglePlayback() {
+		if (!audioSources.length) return;
+
 		if (audio.paused) {
 			const playAttempt = audio.play();
 			if (playAttempt && playAttempt.catch) {
@@ -218,16 +227,36 @@ if (target) {
 		document.getElementById('tv-date').textContent = now.toDateString();
 	}
 
-	for (let index = 0; index < audioSources.length; index += 1) {
-		const button = document.createElement('button');
-		button.type = 'button';
-		button.textContent = String(index + 1);
-		button.setAttribute('data-tv-focus', '');
-		button.setAttribute('data-audio-index', String(index));
-		button.addEventListener('click', function () {
-			setAudio(Number(this.getAttribute('data-audio-index')));
-		});
-		audioButtonsContainer.appendChild(button);
+	function createAudioButtons() {
+		for (let index = 0; index < audioSources.length; index += 1) {
+			const button = document.createElement('button');
+			button.type = 'button';
+			button.textContent = String(index + 1);
+			button.setAttribute('data-tv-focus', '');
+			button.setAttribute('data-audio-index', String(index));
+			button.addEventListener('click', function () {
+				setAudio(Number(this.getAttribute('data-audio-index')));
+			});
+			audioButtonsContainer.appendChild(button);
+		}
+	}
+
+	function loadMediaManifest(callback) {
+		const script = document.createElement('script');
+		script.src = resolveMediaPath('media-manifest.js') + '?v=' + String(Date.now());
+		script.onload = function () {
+			const manifest = window.JUST_RAIN_MEDIA_MANIFEST;
+			if (manifest && manifest.audio instanceof Array && manifest.video instanceof Array) {
+				callback(manifest);
+				return;
+			}
+
+			callback(null);
+		};
+		script.onerror = function () {
+			callback(null);
+		};
+		document.head.appendChild(script);
 	}
 
 	playButton.addEventListener('click', togglePlayback);
@@ -283,11 +312,32 @@ if (target) {
 		}
 	});
 
-	setVideo(currentVideoIndex);
-	setAudio(currentAudioIndex);
 	audio.volume = Number(volumeInput.value);
 	updateClock();
 	focusItem(focusIndex);
+
+	loadMediaManifest(function (manifest) {
+		if (!manifest || !manifest.video.length || !manifest.audio.length) {
+			playButton.textContent = 'Unavailable';
+			footer.textContent = 'Could not load media list';
+			return;
+		}
+
+		audioSources = manifest.audio;
+		videoSources = manifest.video;
+		currentVideoIndex = 0;
+		currentAudioIndex = 0;
+		createAudioButtons();
+		setVideo(currentVideoIndex);
+		setAudio(currentAudioIndex);
+		playButton.textContent = 'Play';
+		footer.textContent =
+			'Just Rain · ' +
+			String(videoSources.length) +
+			' scenes · ' +
+			String(audioSources.length) +
+			' sounds';
+	});
 
 	setInterval(updateClock, 1000);
 	setInterval(

@@ -58,6 +58,11 @@ This creates `dist/tizen/JustRainTVDev-unsigned.wgt`. It still needs a developer
 signature. The deployed site must contain the files under `video/tv/` before the
 streaming package is installed.
 
+The TV application loads `media-manifest.js` when it starts. This manifest is
+generated automatically from `static/video/tv/*.mp4` and `static/audio/*.mp3`
+during the site build. Adding or removing media therefore only requires a site
+deployment; the installed streaming WGT does not need to be rebuilt.
+
 Apps2Samsung can sign and install the development WGT without installing Tizen
 Studio. The TV must be in Developer Mode, and its Host PC IP must match the
 computer running the installer.

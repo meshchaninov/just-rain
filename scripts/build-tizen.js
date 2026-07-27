@@ -19,8 +19,8 @@ const copy = async (source, destination) => {
 	await cp(new URL(source, import.meta.url), destinationUrl, { recursive: true });
 };
 
-const media = JSON.parse(
-	await readFile(new URL('../src/lib/media.json', import.meta.url), { encoding: 'utf8' })
+const mediaManifest = JSON.parse(
+	await readFile(new URL('../static/media-manifest.json', import.meta.url), { encoding: 'utf8' })
 );
 
 const projectDestination = `../dist/tizen/${projectName}/`;
@@ -40,12 +40,18 @@ const copies = [
 ];
 
 if (!devBuild) {
-	copies.push(copy('../static/audio', projectDestination + 'audio'));
+	copies.push(copy('../static/media-manifest.js', projectDestination + 'media-manifest.js'));
 
-	for (const source of media.tvVideo) {
+	for (const source of mediaManifest.audio) {
+		copies.push(copy('../static/' + source, projectDestination + source));
+	}
+
+	for (const source of mediaManifest.video) {
 		copies.push(
 			copy('../static/' + source.media, projectDestination + source.media),
-			copy('../static/' + source.preview, projectDestination + source.preview)
+			...(source.preview
+				? [copy('../static/' + source.preview, projectDestination + source.preview)]
+				: [])
 		);
 	}
 }
