@@ -33,7 +33,7 @@ browser autoplay restrictions.
 ### Samsung TV application (WGT)
 
 The repository also contains a Tizen 3.0 TV application configured for the
-Samsung UE43M5503. It provides 16 TV-compatible H.264 rain backgrounds,
+Samsung UE43M5503. It provides 11 TV-compatible H.264 rain backgrounds,
 disables the TV pointer, and uses the remote's D-pad, Enter, and Back buttons.
 
 Build the Tizen project and an unsigned package:

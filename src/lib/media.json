@@ -11,11 +11,6 @@
 		{ "media": "video/rain4.webm", "preview": "video/preview/rain4.webp" },
 		{ "media": "video/rain8.webm", "preview": "video/preview/rain8.webp" },
 		{ "media": "video/rain3.webm", "preview": "video/preview/rain3.webp" },
-		{ "media": "video/rain2.webm", "preview": "video/preview/rain2.webp" },
-		{ "media": "video/tv/rain12.mp4", "preview": "video/preview/rain12.webp" },
-		{ "media": "video/tv/rain13.mp4", "preview": "video/preview/rain13.webp" },
-		{ "media": "video/tv/rain14.mp4", "preview": "video/preview/rain14.webp" },
-		{ "media": "video/tv/rain15.mp4", "preview": "video/preview/rain15.webp" },
-		{ "media": "video/tv/rain16.mp4", "preview": "video/preview/rain16.webp" }
+		{ "media": "video/rain2.webm", "preview": "video/preview/rain2.webp" }
 	]
 }
