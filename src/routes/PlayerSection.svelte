@@ -27,17 +27,9 @@
 	onMount(() => {
 		autoPlayAudio = true;
 		configureBackgroundPlayback();
+		claimMediaSession();
 
-		if ('mediaSession' in navigator) {
-			navigator.mediaSession.setActionHandler('play', () => {
-				pause = false;
-				player?.play();
-			});
-			navigator.mediaSession.setActionHandler('pause', () => {
-				pause = true;
-				player?.pause();
-			});
-		}
+		const reclaimMediaSession = () => claimMediaSession();
 
 		const activateAudio = () => {
 			initializeAudioGraph().catch((error) => {
@@ -48,15 +40,22 @@
 		// Mobile browsers only allow AudioContext to start during a user gesture.
 		document.addEventListener('pointerdown', activateAudio, { passive: true });
 		document.addEventListener('keydown', activateAudio);
+		window.addEventListener('just-rain:reclaim-media-session', reclaimMediaSession);
 
 		return () => {
 			document.removeEventListener('pointerdown', activateAudio);
 			document.removeEventListener('keydown', activateAudio);
+			window.removeEventListener('just-rain:reclaim-media-session', reclaimMediaSession);
 			audioContext?.close();
 
 			if ('mediaSession' in navigator) {
-				navigator.mediaSession.setActionHandler('play', null);
-				navigator.mediaSession.setActionHandler('pause', null);
+				for (const action of mediaSessionActions) {
+					try {
+						navigator.mediaSession.setActionHandler(action, null);
+					} catch {
+						// Ignore actions unsupported by this browser.
+					}
+				}
 			}
 		};
 	});
@@ -66,26 +65,7 @@
 	});
 
 	$effect(() => {
-		if ('mediaSession' in navigator && 'MediaMetadata' in window) {
-			navigator.mediaSession.metadata = new MediaMetadata({
-				title: 'Rain ambience',
-				artist: 'Just Rain',
-				album: 'Just Rain',
-				artwork: [
-					{
-						src: getPlayerArtwork(bgSrcVideo),
-						sizes: '1200x1200',
-						type: 'image/jpeg'
-					}
-				]
-			});
-		}
-	});
-
-	$effect(() => {
-		if ('mediaSession' in navigator) {
-			navigator.mediaSession.playbackState = pause ? 'paused' : 'playing';
-		}
+		claimMediaSession();
 	});
 
 	async function initializeAudioGraph() {
@@ -122,6 +102,76 @@
 
 		if (audioSession) {
 			audioSession.type = 'playback';
+		}
+	}
+
+	/** @type {MediaSessionAction[]} */
+	const mediaSessionActions = [
+		'play',
+		'pause',
+		'stop',
+		'seekbackward',
+		'seekforward',
+		'seekto',
+		'previoustrack',
+		'nexttrack'
+	];
+
+	function claimMediaSession() {
+		if (!('mediaSession' in navigator)) return;
+
+		if ('MediaMetadata' in window) {
+			navigator.mediaSession.metadata = new MediaMetadata({
+				title: 'Rain ambience',
+				artist: 'Just Rain',
+				album: 'Just Rain',
+				artwork: [
+					{
+						src: getPlayerArtwork(bgSrcVideo),
+						sizes: '1200x1200',
+						type: 'image/jpeg'
+					}
+				]
+			});
+		}
+
+		setMediaSessionAction('play', () => {
+			pause = false;
+			player?.play();
+		});
+		setMediaSessionAction('pause', () => {
+			pause = true;
+			player?.pause();
+		});
+
+		// Rain is an endless ambience: ignore every transport action except play/pause.
+		for (const action of mediaSessionActions.slice(2)) {
+			setMediaSessionAction(action, null);
+		}
+
+		navigator.mediaSession.playbackState = pause ? 'paused' : 'playing';
+
+		try {
+			// Infinity marks this as a live/endless stream and removes remaining time on supporting UIs.
+			navigator.mediaSession.setPositionState({ duration: Infinity, playbackRate: 1, position: 0 });
+		} catch {
+			try {
+				navigator.mediaSession.setPositionState();
+			} catch {
+				// Position state is not supported by every Safari version.
+			}
+		}
+	}
+
+	/**
+	 * @param {MediaSessionAction} action
+	 * @param {MediaSessionActionHandler | null} handler
+	 */
+	function setMediaSessionAction(action, handler) {
+		try {
+			navigator.mediaSession.setActionHandler(action, handler);
+		} catch {
+			// Ignore actions unsupported by this browser.
 		}
 	}
 

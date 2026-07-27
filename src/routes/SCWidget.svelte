@@ -13,6 +13,7 @@
 	let playlistLength = 0;
 	let widgetReady = $state(false);
 	let loading = $state(true);
+	let lastMediaSessionClaim = 0;
 
 	onMount(() => {
 		widget = window.SC.Widget(SCIframe);
@@ -30,6 +31,9 @@
 
 		function onReady() {
 			widget.unbind(window.SC.Widget.Events.FINISH);
+			widget.unbind(window.SC.Widget.Events.PLAY);
+			widget.unbind(window.SC.Widget.Events.PAUSE);
+			widget.unbind(window.SC.Widget.Events.PLAY_PROGRESS);
 			console.log('SC Widget is ready');
 			widget.getSounds(function (sounds) {
 				playlistLength = sounds.length;
@@ -41,6 +45,9 @@
 				}
 
 				widget.bind(window.SC.Widget.Events.FINISH, playNextSong);
+				widget.bind(window.SC.Widget.Events.PLAY, reclaimRainMediaSession);
+				widget.bind(window.SC.Widget.Events.PAUSE, reclaimRainMediaSession);
+				widget.bind(window.SC.Widget.Events.PLAY_PROGRESS, reclaimRainMediaSession);
 				widgetReady = true;
 				changeVolume();
 
@@ -59,6 +66,9 @@
 		return () => {
 			widget.unbind(window.SC.Widget.Events.READY);
 			widget.unbind(window.SC.Widget.Events.FINISH);
+			widget.unbind(window.SC.Widget.Events.PLAY);
+			widget.unbind(window.SC.Widget.Events.PAUSE);
+			widget.unbind(window.SC.Widget.Events.PLAY_PROGRESS);
 		};
 	});
 
@@ -84,6 +94,14 @@
 	function changeVolume() {
 		if (!widgetReady) return;
 		widget.setVolume(volume * 100 * 0.8);
+	}
+
+	function reclaimRainMediaSession() {
+		const now = Date.now();
+		if (now - lastMediaSessionClaim < 1000) return;
+
+		lastMediaSessionClaim = now;
+		window.dispatchEvent(new Event('just-rain:reclaim-media-session'));
 	}
 </script>
 
